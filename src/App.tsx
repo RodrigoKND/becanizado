@@ -8,12 +8,11 @@ function AppContent() {
   const { user, profile, loading } = useAuth();
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <section className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Cargando...</div>
-      </div>
+      </section>
     );
   }
-
   if (!user || !profile) {
     return <Login />;
   }
