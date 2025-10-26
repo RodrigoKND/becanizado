@@ -15,6 +15,7 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
   const [imagePreview, setImagePreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,8 +59,11 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
 
       if (insertError) throw insertError;
 
-      onSuccess();
-      onClose();
+      setSuccess(true);
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 1500);
     } catch (err: any) {
       setError(err.message || 'Error al enviar la respuesta');
     } finally {
@@ -86,6 +90,12 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
         </div>
 
         <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+          {success && (
+            <div className="mx-4 md:mx-6 mt-4 md:mt-6 p-3 md:p-4 bg-[#787e86] bg-opacity-20 border border-[#b7babe] rounded-lg">
+              <p className="text-[#b7babe] text-sm md:text-base font-semibold">✓ ¡Respuesta enviada correctamente!</p>
+            </div>
+          )}
+          
           {error && (
             <div className="mx-4 md:mx-6 mt-4 md:mt-6 p-3 md:p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
               <p className="text-red-200 text-sm md:text-base">{error}</p>
@@ -105,13 +115,14 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
                       alt="Preview"
                       className="max-h-64 md:max-h-96 mx-auto rounded-xl shadow-lg"
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-xl pointer-events-none" />
                     <button
                       type="button"
                       onClick={() => {
                         setImage(null);
                         setImagePreview('');
                       }}
-                      className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 md:p-3 rounded-full transition-all shadow-lg hover:scale-110"
+                      className="absolute top-2 right-2 z-20 bg-red-600 hover:bg-red-700 text-white p-2 md:p-3 rounded-full transition-all shadow-lg hover:scale-110"
                     >
                       <X size={18} />
                     </button>
