@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AboutMeChannelYt from './components/AboutMeChannelYt';
 
 function AppContent() {
   const { user, profile, loading } = useAuth();
@@ -24,7 +26,14 @@ function AppContent() {
     );
   }
 
-  return <Dashboard />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/sobre-mi-canal-yt" element={<AboutMeChannelYt/>} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default function App() {

@@ -46,6 +46,7 @@
   color: #b7babe;
   transition: color 0.2s;
 }
+
 .modal-close:hover {
   color: white;
 }
@@ -121,10 +122,12 @@
   position: relative;
   display: inline-block;
 }
+
 .image-preview img {
   max-height: 16rem;
   border-radius: 0.5rem;
 }
+
 .image-remove {
   position: absolute;
   top: 0.5rem;
@@ -137,6 +140,7 @@
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .image-remove:hover {
   background: #b91c1c;
 }
@@ -147,6 +151,7 @@
   gap: 0.75rem;
   flex-direction: column;
 }
+
 @media (min-width: 640px) {
   .modal-actions {
     flex-direction: row;
@@ -170,9 +175,11 @@
   background-color: #0d9488;
   color: white;
 }
+
 .btn-primary:hover:not(:disabled) {
   background-color: #0f766e;
 }
+
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -183,6 +190,7 @@
   color: #b7babe;
   background-color: transparent;
 }
+
 .btn-secondary:hover {
   background-color: #787e86;
 }
@@ -337,4 +345,14 @@
 
 .btn-secondary:hover:not(:disabled) {
   filter: brightness(0.95);
+}
+
+@keyframes border {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

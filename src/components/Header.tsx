@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, Youtube } from 'lucide-react';
 
 interface HeaderProps {
@@ -8,7 +7,7 @@ interface HeaderProps {
 
 export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
   return (
-    <header 
+    <header
       className="min-h-16 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-0 border-b"
       style={{ backgroundColor: '#3e4145', borderColor: '#84888c' }}
     >
@@ -36,19 +35,28 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
         </div>
       </div>
 
+
+
       {/* Botón de YouTube */}
-      <a
-        href="https://www.youtube.com/@BECANIZADO"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex text-red-300 hover:bg-red-600 hover:text-white border border-red-300 items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
-      >
-        <Youtube size={20} />
-        <span className="font-medium hidden xs:inline sm:inline">
-          YouTube
-        </span>
-        <span className="font-medium xs:hidden sm:hidden">YT</span>
-      </a>
-    </header>
+      <div className="flex justify-center my-4">
+        <a
+          href="https://www.youtube.com/@BECANIZADO"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative inline-flex overflow-hidden rounded-full p-[1px]"
+
+        >
+          {/* Border animado */}
+          <span className="absolute inset-[-1000%] [animation:border_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ff4c4c_0%,#cc0000_50%,#ff7f7f_100%)]"></span>
+
+          {/* Contenido */}
+          <span className="inline-flex items-center justify-center w-full px-4 py-2 text-sm text-red-200 rounded-full cursor-pointer bg-[#3e4145] backdrop-blur-3xl whitespace-nowrap flex gap-2 font-medium"
+          >
+            <Youtube size={20} />
+            Youtube
+          </span>
+        </a>
+      </div>
+    </header >
   );
 }
