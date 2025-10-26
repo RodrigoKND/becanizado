@@ -10,12 +10,12 @@ import Sidebar from './Sidebar';
 interface TemplateDashboardProps {
   children: React.ReactNode;
   profile: any;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  selectedExercise: string | null;
-  setSelectedExercise: (id: string | null) => void;
-  selectedSubmission: Submission | null;
-  setSelectedSubmission: (sub: Submission | null) => void;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+  selectedExercise?: string | null;
+  setSelectedExercise?: (id: string | null) => void;
+  selectedSubmission?: Submission | null;
+  setSelectedSubmission?: (sub: Submission | null) => void;
 }
 
 export default function TemplateDashboard({
@@ -44,7 +44,7 @@ export default function TemplateDashboard({
       <Sidebar sidebarOpen={sidebarOpen} />
 
       <div className="flex-1 flex flex-col w-full">
-        <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Header searchQuery={searchQuery || ''} onSearchChange={setSearchQuery!} />
 
         {/* Botón flotante solo para mobile */}
         {profile?.role === 'professor' && (
@@ -110,7 +110,7 @@ export default function TemplateDashboard({
       {selectedExercise && (
         <SubmitExercise
           exerciseId={selectedExercise}
-          onClose={() => setSelectedExercise(null)}
+          onClose={() => setSelectedExercise && setSelectedExercise(null)}
           onSuccess={() => {}}
         />
       )}
@@ -118,7 +118,7 @@ export default function TemplateDashboard({
       {selectedSubmission && (
         <FeedbackModal
           submission={selectedSubmission}
-          onClose={() => setSelectedSubmission(null)}
+          onClose={() => setSelectedSubmission && setSelectedSubmission(null)}
           onSuccess={() => {}}
         />
       )}
