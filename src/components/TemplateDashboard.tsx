@@ -1,29 +1,38 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-
-import Header from './Header';
-import Sidebar from './Sidebar';
+import { Submission } from '../lib/supabase';
 import CreateExercise from './CreateExercise';
 import SubmitExercise from './SubmitExercise';
 import FeedbackModal from './FeedbackModal';
-import { Submission } from '../lib/supabase';
+import Header from './Header';
+import Sidebar from './Sidebar';
 
 interface TemplateDashboardProps {
   children: React.ReactNode;
+  profile: any;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  selectedExercise: string | null;
+  setSelectedExercise: (id: string | null) => void;
+  selectedSubmission: Submission | null;
+  setSelectedSubmission: (sub: Submission | null) => void;
 }
 
-export default function TemplateDashboard({ children }: TemplateDashboardProps) {
-  const { profile } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
+export default function TemplateDashboard({
+  children,
+  profile,
+  searchQuery,
+  setSearchQuery,
+  selectedExercise,
+  setSelectedExercise,
+  selectedSubmission,
+  setSelectedSubmission,
+}: TemplateDashboardProps) {
   const [showCreateExercise, setShowCreateExercise] = useState(false);
-  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <section className="min-h-screen bg-[#3e4145] flex">
-
       {/* Overlay Sidebar en Mobile */}
       {sidebarOpen && (
         <div
@@ -37,6 +46,7 @@ export default function TemplateDashboard({ children }: TemplateDashboardProps) 
       <div className="flex-1 flex flex-col w-full">
         <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
+        {/* Botón flotante solo para mobile */}
         {profile?.role === 'professor' && (
           <button
             onClick={() => setShowCreateExercise(true)}
@@ -49,15 +59,15 @@ export default function TemplateDashboard({ children }: TemplateDashboardProps) 
 
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 md:p-6 lg:p-8">
+            
+            {/* Contenido principal */}
+            <div className="lg:col-span-2 xl:col-span-3">{children}</div>
 
-            {/* Aquí entra el contenido dinámico */}
-            {children}
-
-            {/* Columna Derecha (Solo desktop) */}
+            {/* Columna derecha (desktop) */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="sticky top-20 space-y-6">
 
-                {/* Perfil Rápido */}
+                {/* Perfil rápido */}
                 <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
                   <h3 className="text-lg font-bold text-[#b7babe] mb-3 border-b border-[#787e86]/30 pb-2">
                     Bienvenido {profile?.role === 'professor' ? 'profesor' : profile?.full_name}
@@ -68,7 +78,7 @@ export default function TemplateDashboard({ children }: TemplateDashboardProps) 
                   </p>
                 </div>
 
-                {/* Botón acciones solo para profesor */}
+                {/* Acciones profesor */}
                 {profile?.role === 'professor' && (
                   <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
                     <h3 className="text-lg font-bold text-[#b7babe] mb-3">Acciones</h3>
