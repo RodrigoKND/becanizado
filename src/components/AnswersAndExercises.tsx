@@ -49,12 +49,16 @@ const SubmissionPost = ({ submission, onClick }: { submission: Submission; onCli
                     </span>
                 )}
             </div>
-            <button
-                className="px-3 py-1 bg-[#787e86] hover:bg-[#84888c] text-white rounded-full transition-colors text-xs font-semibold"
-                onClick={onClick}
-            >
-                {submission.feedback ? 'Ver Detalle' : 'Revisar'}
-            </button>
+          <button
+  className="px-3 py-1 bg-[#787e86] hover:bg-[#84888c] text-white rounded-full transition-colors text-xs font-semibold"
+  onClick={(e) => {
+    e.stopPropagation();
+    onClick();
+  }}
+>
+  {submission.feedback ? 'Ver Detalle' : 'Revisar'}
+</button>
+
         </footer>
     </article>
 );
