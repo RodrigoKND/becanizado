@@ -12,6 +12,7 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
   const [feedback, setFeedback] = useState(submission.feedback || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +27,11 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
 
       if (updateError) throw updateError;
 
-      onSuccess();
-      onClose();
+      setSuccess(true);
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 1500);
     } catch (err: any) {
       setError(err.message || 'Error al guardar la retroalimentación');
     } finally {
@@ -62,6 +66,21 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
 
         {/* Contenido del modal */}
         <div className="p-4 sm:p-6">
+          {/* Mensaje de éxito */}
+          {success && (
+            <div 
+              className="mb-4 p-3 border rounded-lg"
+              style={{ 
+                backgroundColor: 'rgba(120, 126, 134, 0.2)', 
+                borderColor: '#b7babe'
+              }}
+            >
+              <p className="text-sm sm:text-base font-semibold" style={{ color: '#b7babe' }}>
+                ✓ ¡Retroalimentación guardada correctamente!
+              </p>
+            </div>
+          )}
+
           {/* Información del estudiante */}
           <div className="mb-4 sm:mb-6">
             <p className="text-xs sm:text-sm mb-2" style={{ color: '#84888c' }}>
