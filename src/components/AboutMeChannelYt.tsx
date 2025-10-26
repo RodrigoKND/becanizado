@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { Youtube } from 'lucide-react';
 import TemplateDashboard from "./TemplateDashboard";
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AboutMeChannelYt() {
+    const { profile } = useAuth();
     return (
-        <TemplateDashboard>
+        <TemplateDashboard profile={profile}>
             <div className="w-full lg:col-span-2 xl:col-span-3">
                 <section className="w-full mx-auto py-10">
                     <div className="space-y-4 max-w-3xl">
@@ -42,8 +44,6 @@ export default function AboutMeChannelYt() {
                     </Link>
                 </section>
             </div>
-
-
         </TemplateDashboard>
     );
 }
