@@ -13,6 +13,7 @@ function AppContent() {
       </section>
     );
   }
+  
   if (!user || !profile) {
     return <Login />;
   }
