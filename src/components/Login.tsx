@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus } from 'lucide-react';
-
-interface LoginProps {
-  onToggleMode: () => void;
-}
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Componente memoizado para símbolos matemáticos
 const MathSymbols = React.memo(() => {
@@ -22,6 +20,8 @@ const MathSymbols = React.memo(() => {
 });
 
 export default function Login() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,18 +30,16 @@ export default function Login() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [imageLoaded, setImageLoaded] = useState(false);
-  
+
   const profileCheckRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         const userId = session.user.id;
-        
+
         if (profileCheckRef.current.has(userId)) return;
         profileCheckRef.current.add(userId);
-
-        console.log('Usuario logueado', session.user);
 
         try {
           const { data: profile } = await supabase
@@ -58,8 +56,7 @@ export default function Login() {
               role: 'student',
             });
           }
-
-          window.location.href = '/dashboard';
+          navigate("/dashboard");
         } catch (err) {
           console.error('Error al verificar/crear perfil:', err);
           profileCheckRef.current.delete(userId);
@@ -127,6 +124,11 @@ export default function Login() {
     }
   };
 
+  if (user) {
+    navigate("/dashboard");
+    return;
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-main-gradient">
       {/* Patrón de fondo */}
@@ -139,7 +141,7 @@ export default function Login() {
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-md">
           <div className="rounded-lg shadow-2xl p-8 bg-card">
-            
+
             {/* Logo */}
             <div className="flex justify-center mb-8">
               <div className="relative h-20 w-20">
@@ -149,9 +151,8 @@ export default function Login() {
                 <img
                   src="/LogoBecanizado.jpeg"
                   alt="Becanizado Logo"
-                  className={`h-20 w-20 object-contain transition-opacity duration-300 ${
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  className={`h-20 w-20 object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
                   onLoad={() => setImageLoaded(true)}
                   loading="lazy"
                 />
