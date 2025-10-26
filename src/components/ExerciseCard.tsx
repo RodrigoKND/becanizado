@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, MessageSquare, X, Download, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { Exercise, Submission, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -257,43 +257,46 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#787e86]">
-  <button
-    onClick={() => setShowSubmissions(!showSubmissions)}
-    className="flex items-center justify-center sm:justify-start gap-2 
+            <button
+              onClick={() => setShowSubmissions(!showSubmissions)}
+              className="flex items-center justify-center sm:justify-start gap-2 
       bg-[#2b3238]/50 hover:bg-[#2b3238]/80 text-[#e2e2e2] 
       transition-colors py-2 px-4 rounded-lg 
       font-medium text-sm md:text-base shadow-sm hover:shadow-md"
-  >
-    <MessageSquare size={18} />
-    <span>
-      {submissions.length} {submissions.length === 1 ? 'Respuesta' : 'Respuestas'}
-    </span>
-  </button>
+            >
+              <MessageSquare size={18} />
+              <span>
+                {submissions.length} {submissions.length === 1 ? 'Respuesta' : 'Respuestas'}
+              </span>
 
-  {profile?.role === 'student' && onSubmit && (
-    <button
-      onClick={onSubmit}
-      className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] 
+              {showSubmissions ? <span><ChevronUp size={18} fill='#fff' /></span>
+                : <span><ChevronDown size={18} fill='#fff' /></span>}
+            </button>
+
+            {profile?.role === 'student' && onSubmit && (
+              <button
+                onClick={onSubmit}
+                className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] 
         text-white rounded-lg transition-colors 
         font-medium text-sm md:text-base shadow-md hover:shadow-lg"
-    >
-      Responder
-    </button>
-  )}
-</div>
+              >
+                Responder
+              </button>
+            )}
+          </div>
 
-{profile?.role === 'professor' && profile.id === exercise.professor_id && (
-  <button
-    onClick={() => setConfirmDelete(true)}
-    className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
+          {profile?.role === 'professor' && profile.id === exercise.professor_id && (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
       bg-[#161b1f] hover:bg-[#1f262b] text-white 
       rounded-lg transition-colors font-medium 
       text-sm md:text-base shadow-md hover:shadow-lg border border-[#2b3238]"
-  >
-    <X size={18} />
-    Eliminar
-  </button>
-)}
+            >
+              <X size={18} />
+              Eliminar
+            </button>
+          )}
 
           {showSubmissions && submissions.length > 0 && (
             <div className="mt-4 space-y-3 pt-4 border-t border-[#787e86]">
