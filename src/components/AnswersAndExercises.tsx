@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Filter, Clock, CheckCircle, MessageSquare } from 'lucide-react';
-import { Exercise, Submission } from '../lib/supabase';
+import { Submission } from '../lib/supabase';
 import ExerciseCard from "./ExerciseCard";
+import { useExercises } from "../hooks/useExercises";
 
 type FilterType = 'all' | 'student' | 'exercise';
 const SubmissionPost = ({ submission, onClick }: { submission: Submission; onClick: () => void }) => (
@@ -49,22 +50,21 @@ const SubmissionPost = ({ submission, onClick }: { submission: Submission; onCli
                     </span>
                 )}
             </div>
-          <button
-  className="px-3 py-1 bg-[#787e86] hover:bg-[#84888c] text-white rounded-full transition-colors text-xs font-semibold"
-  onClick={(e) => {
-    e.stopPropagation();
-    onClick();
-  }}
->
-  {submission.feedback ? 'Ver Detalle' : 'Revisar'}
-</button>
+            <button
+                className="px-3 py-1 bg-[#787e86] hover:bg-[#84888c] text-white rounded-full transition-colors text-xs font-semibold"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClick();
+                }}
+            >
+                {submission.feedback ? 'Ver Detalle' : 'Revisar'}
+            </button>
 
         </footer>
     </article>
 );
 
 interface ExerciseCardProps {
-    exercises: Exercise[];
     searchQuery: string;
     profile: any;
     setSelectedExercise: (exerciseId: string | null) => void;
@@ -75,13 +75,29 @@ interface ExerciseCardProps {
 export default function AnswersAndExercises({
     searchQuery,
     profile,
-    exercises,
     submissions,
     setSelectedExercise,
     setSelectedSubmission,
 }: ExerciseCardProps) {
 
     const [filterType, setFilterType] = useState<FilterType>('all');
+    
+    const { data: exercise } = useExercises();
+    const filteredExercises = exercise?.filter((exercise) => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return exercise.title.toLowerCase().includes(query) ||
+            exercise.description.toLowerCase().includes(query) ||
+            exercise.profiles[0]?.full_name.toLowerCase().includes(query);
+    });
+
+    const filteredSubmissions = submissions.filter((submission) => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return submission.student?.full_name.toLowerCase().includes(query) ||
+            submission.exercise?.title.toLowerCase().includes(query);
+    });
+
 
     const getFilteredContent = () => {
         // Feed de Respuestas (para el Profesor)
@@ -116,7 +132,7 @@ export default function AnswersAndExercises({
                 <h2 className="text-xl font-bold text-[#b7babe] mb-6 border-b border-[#787e86]/50 pb-3">
                     {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
                 </h2>
-                {filteredExercises.length === 0 ? (
+                {filteredExercises?.length === 0 ? (
                     <div className="text-center py-12 text-[#84888c] bg-[#3e4145] rounded-xl p-6">
                         {searchQuery
                             ? 'No se encontraron ejercicios con tu búsqueda.'
@@ -125,7 +141,7 @@ export default function AnswersAndExercises({
                 ) : (
                     // Usamos una columna única para el 'feed' de tarjetas
                     <div className="space-y-4">
-                        {filteredExercises.map((exercise) => (
+                        {filteredExercises?.map((exercise) => (
                             // ExerciseCard debería tener un diseño más vertical y enfocado al contenido (tipo Brainly)
                             <ExerciseCard
                                 key={exercise.id}
@@ -142,22 +158,6 @@ export default function AnswersAndExercises({
             </div>
         );
     };
-
-    const filteredExercises = exercises.filter((exercise) => {
-        if (!searchQuery) return true;
-        const query = searchQuery.toLowerCase();
-        return exercise.title.toLowerCase().includes(query) ||
-            exercise.description.toLowerCase().includes(query) ||
-            exercise.professor?.full_name.toLowerCase().includes(query);
-    });
-
-    const filteredSubmissions = submissions.filter((submission) => {
-        if (!searchQuery) return true;
-        const query = searchQuery.toLowerCase();
-        return submission.student?.full_name.toLowerCase().includes(query) ||
-            submission.exercise?.title.toLowerCase().includes(query);
-    });
-
 
     return (
         <div className="lg:col-span-2 xl:col-span-3">
