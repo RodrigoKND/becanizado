@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-// Componente memoizado para símbolos matemáticos
 const MathSymbols = React.memo(() => {
   const symbols = ['π', '∑', '∫', '√', '∞', 'Δ', '∂', 'θ', 'α', 'Σ'];
 
@@ -21,7 +20,6 @@ const MathSymbols = React.memo(() => {
 
 export default function Login() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,7 +54,6 @@ export default function Login() {
               role: 'student',
             });
           }
-          navigate("/dashboard");
         } catch (err) {
           console.error('Error al verificar/crear perfil:', err);
           profileCheckRef.current.delete(userId);
@@ -115,7 +112,7 @@ export default function Login() {
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin + '/auth/callback' },
+        options: { redirectTo: window.location.origin + '/dashboard' },
       });
       if (oauthError) throw oauthError;
     } catch (err: any) {
@@ -124,13 +121,13 @@ export default function Login() {
     }
   };
 
+
   if (user) {
-    navigate("/dashboard");
-    return;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-main-gradient">
+    <section className="min-h-screen relative overflow-hidden bg-main-gradient">
       {/* Patrón de fondo */}
       <div className="absolute inset-0 bg-pattern" />
 
@@ -288,6 +285,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

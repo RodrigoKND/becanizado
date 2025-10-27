@@ -3,15 +3,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase, Exercise, Submission } from '../lib/supabase';
 import AnswersAndExercises from './AnswersAndExercises';
 import TemplateDashboard from './TemplateDashboard';
+import { Navigate } from 'react-router-dom';
 
 export default function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     if (profile) loadData();
@@ -60,12 +61,8 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#3e4145] flex items-center justify-center">
-        <div className="text-[#b7babe] text-xl">Cargando...</div>
-      </div>
-    );
+  if(!user || !profile){
+    return <Navigate to="/" replace />;
   }
 
   return (

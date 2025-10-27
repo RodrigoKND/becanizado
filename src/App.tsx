@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutMeChannelYt from './components/AboutMeChannelYt';
 
 function AppContent() {
-  const { user, profile, loading } = useAuth();
+  const { loading } = useAuth();
   if (loading) {
     return (
       <section className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -14,10 +14,6 @@ function AppContent() {
     );
   }
   
-  if (!user || !profile) {
-    return <Login />;
-  }
-
   return (
     <Router>
       <Routes>
