@@ -13,7 +13,7 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
   // Función para verificar si la ruta coincide
   const isActive = (path: string) => location.pathname === path;
-
+  
   return (
     <aside
       className={`fixed lg:static inset-y-0 left-0 z-50 transform ${
