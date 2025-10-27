@@ -12,6 +12,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
+    "@tanstack/query-async-storage-persister": "^5.90.7",
+    "@tanstack/query-persist-client-core": "^5.91.4",
+    "@tanstack/react-query": "^5.90.5",
+    "localforage": "^1.10.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

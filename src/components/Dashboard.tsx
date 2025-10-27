@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase, Exercise, Submission } from '../lib/supabase';
+import { Submission } from '../lib/supabase';
 import AnswersAndExercises from './AnswersAndExercises';
 import TemplateDashboard from './TemplateDashboard';
 import { Navigate } from 'react-router-dom';
+import { useLoadExercises } from '../hooks/useExercises';
+import { useSubmissions } from '../hooks/useSubmissions';
 
 export default function Dashboard() {
   const { profile, user } = useAuth();
-  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
@@ -27,41 +28,27 @@ export default function Dashboard() {
     }
   };
 
+  const { data } = useLoadExercises();
+
   const loadExercises = async () => {
     try {
-      const { data, error } = await supabase
-        .from('exercises')
-        .select(`
-          *,
-          professor:profiles!professor_id(id, full_name, email, youtube_channel)
-        `)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      setExercises(data || []);
+      return data || [];
     } catch (error) {
       console.error('Error loading exercises:', error);
     }
   };
-
+  
+  const { data: submissionsData } = useSubmissions();
   const loadSubmissions = async () => {
     if (profile?.role !== 'professor') return;
     try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select(`
-          *,
-          student:profiles!student_id(id, full_name, email),
-          exercise:exercises!exercise_id(id, title)
-        `)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      setSubmissions(data || []);
+      setSubmissions(submissionsData || []);
     } catch (error) {
       console.error('Error loading submissions:', error);
     }
   };
 
-  if(!user || !profile){
+  if (!user || !profile) {
     return <Navigate to="/" replace />;
   }
 
@@ -76,7 +63,6 @@ export default function Dashboard() {
       profile={profile}
     >
       <AnswersAndExercises
-        exercises={exercises}
         submissions={submissions}
         searchQuery={searchQuery}
         profile={profile}

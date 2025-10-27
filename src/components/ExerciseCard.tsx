@@ -159,6 +159,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           student:profiles!student_id(id, full_name, email)
         `)
         .eq('exercise_id', exercise.id)
+        
         .order('created_at', { ascending: false });
 
       if (profile?.role === 'student') query.eq('student_id', profile.id);
