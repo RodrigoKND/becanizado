@@ -3,6 +3,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutMeChannelYt from './components/AboutMeChannelYt';
+import { CacheProvider } from './contexts/CacheContext';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -13,7 +14,7 @@ function AppContent() {
       </section>
     );
   }
-  
+
   return (
     <Router>
       <Routes>
@@ -27,8 +28,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <CacheProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </CacheProvider>
   );
 }
