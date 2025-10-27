@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
 
 const MathSymbols = React.memo(() => {
   const symbols = ['π', '∑', '∫', '√', '∞', 'Δ', '∂', 'θ', 'α', 'Σ'];
@@ -19,8 +19,8 @@ const MathSymbols = React.memo(() => {
 });
 
 export default function Login() {
-  const { user } = useAuth();
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -30,15 +30,16 @@ export default function Login() {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const profileCheckRef = useRef<Set<string>>(new Set());
-
+  const navigate = useNavigate();
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         const userId = session.user.id;
 
         if (profileCheckRef.current.has(userId)) return;
+        
         profileCheckRef.current.add(userId);
-
+        
         try {
           const { data: profile } = await supabase
             .from('profiles')
@@ -54,12 +55,18 @@ export default function Login() {
               role: 'student',
             });
           }
+
+          navigate('/dashboard');
         } catch (err) {
           console.error('Error al verificar/crear perfil:', err);
           profileCheckRef.current.delete(userId);
         }
       }
     });
+    if (user) {
+      navigate('/dashboard');
+      return;
+    }
 
     return () => {
       listener.subscription.unsubscribe();
@@ -120,11 +127,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-
-
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   return (
     <section className="min-h-screen relative overflow-hidden bg-main-gradient">
