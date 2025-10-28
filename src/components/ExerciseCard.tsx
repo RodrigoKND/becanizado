@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { Exercise, Submission, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -145,7 +146,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [alertModal, setAlertModal] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     loadSubmissions();
   }, [exercise.id]);
@@ -181,9 +182,20 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         .eq('professor_id', profile?.id);
 
       if (error) throw error;
-
+      queryClient.setQueryData(['exercises'], (old: any) => {
+        if (!old) return [];
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exerciseId);
+        if ((old as any).pages) {
+          return {
+            ...old,
+            pages: (old as any).pages.map((page: any) =>
+              page.filter((e: any) => e.id !== exerciseId)
+            ),
+          };
+        }
+        return old;
+      });
       setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
-      setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
       console.error('Error eliminando ejercicio:', error);
       setAlertModal({ type: 'error', message: 'Ocurrió un error al eliminar el ejercicio.' });
