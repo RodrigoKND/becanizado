@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutMeChannelYt from './components/AboutMeChannelYt';
 import { CacheProvider } from './contexts/CacheContext';
+import { Analytics } from "@vercel/analytics/react"
 
 function AppContent() {
   const { loading } = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
     <CacheProvider>
       <AuthProvider>
         <AppContent />
+        <Analytics mode='production' />
       </AuthProvider>
     </CacheProvider>
   );
