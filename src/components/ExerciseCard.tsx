@@ -216,12 +216,12 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
       queryClient.setQueryData(['exercises'], (old: any) => {
         if (!old) return [];
-        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exerciseId);
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exercise.id);
         if ((old as any).pages) {
           return {
             ...old,
             pages: (old as any).pages.map((page: any) =>
-              page.filter((e: any) => e.id !== exerciseId)
+              page.filter((e: any) => e.id !== exercise.id)
             ),
           };
         }
