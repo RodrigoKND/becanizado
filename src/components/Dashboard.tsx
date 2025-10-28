@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [, setLoading] = useState(true);
+  const { data } = useLoadExercises();
+  const { data: submissionsData } = useSubmissions();
 
   useEffect(() => {
     if (profile) loadData();
@@ -28,7 +30,6 @@ export default function Dashboard() {
     }
   };
 
-  const { data } = useLoadExercises();
 
   const loadExercises = async () => {
     try {
@@ -38,7 +39,6 @@ export default function Dashboard() {
     }
   };
   
-  const { data: submissionsData } = useSubmissions();
   const loadSubmissions = async () => {
     if (profile?.role !== 'professor') return;
     try {

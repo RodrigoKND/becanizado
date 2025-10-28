@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar,Trash2, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { Exercise, Submission, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { data } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -146,7 +146,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmDeleteSubmission, setConfirmDeleteSubmission] = useState<string | null>(null);
   const [alertModal, setAlertModal] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     loadSubmissions();
   }, [exercise.id]);
@@ -214,6 +214,20 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
 
       setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
       setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
+      queryClient.setQueryData(['exercises'], (old: any) => {
+        if (!old) return [];
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exerciseId);
+        if ((old as any).pages) {
+          return {
+            ...old,
+            pages: (old as any).pages.map((page: any) =>
+              page.filter((e: any) => e.id !== exerciseId)
+            ),
+          };
+        }
+        return old;
+      });
+      setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
     } catch (error) {
       console.error('Error eliminando respuesta:', error);
       setAlertModal({ type: 'error', message: 'No se pudo eliminar la respuesta.' });
