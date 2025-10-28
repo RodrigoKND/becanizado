@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Upload, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CreateExerciseProps {
   onClose: () => void;
@@ -16,7 +17,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
   const [imagePreview, setImagePreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const queryClient = useQueryClient();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -58,16 +59,29 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
         imageUrl = publicData.publicUrl;
       }
 
-      const { error: insertError } = await supabase
+      const { data:insertedData, error: insertError } = await supabase
         .from('exercises')
         .insert({
           professor_id: user.id,
           title,
           description,
           image_url: imageUrl || null,
-        });
+        }).select().single();
 
       if (insertError) throw insertError;
+
+      queryClient.setQueryData(['exercises'], (old: any) => {
+        if (!old) return [insertedData];
+        if ((old as any).pages) {
+          return {
+            ...old,
+            pages: (old as any).pages.map((page: any, i: number) =>
+              i === 0 ? [insertedData, ...page] : page
+            ),
+          };
+        }
+        return [insertedData, ...old];
+      });
 
       onSuccess();
       onClose();
