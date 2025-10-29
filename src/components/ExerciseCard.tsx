@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar,Trash2, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
+import { Calendar, Trash2, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { Exercise, Submission, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
@@ -149,7 +149,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
   const queryClient = useQueryClient();
   useEffect(() => {
     loadSubmissions();
-  }, [exercise.id]);
+  }, [exercise.id, submissions]);
 
   const loadSubmissions = async () => {
     try {
@@ -168,52 +168,30 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       if (error) throw error;
       setSubmissions(data || []);
     } catch (error) {
-      console.error('Error loading submissions:', error);
+      setAlertModal({
+        type: 'error',
+        message: 'Ocurrió un error al cargar las respuestas.',
+      });
     }
   };
 
   const handleDeleteExercise = async (exerciseId: string) => {
-  try {
-    console.log('Intentando eliminar ejercicio:', exerciseId);
-
-    const { data, error } = await supabase
-      .from('exercises')
-      .delete()
-      .eq('id', exerciseId)
-      .select();
-
-    console.log('✅ Resultado delete:', data, 'Error:', error);
-
-    if (error) throw error;
-    if (!data || data.length === 0) {
-      setAlertModal({
-        type: 'error',
-        message: 'No se encontró el ejercicio o no tienes permisos para eliminarlo.',
-      });
-      return;
-    }
-
-    setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
-  } catch (error) {
-    console.error('Error eliminando ejercicio:', error);
-    setAlertModal({ type: 'error', message: 'Ocurrió un error al eliminar el ejercicio.' });
-  }
-};
-
-
-
-  /* 🗑️ Nueva función: eliminar una respuesta */
-  const handleDeleteSubmission = async (submissionId: string) => {
     try {
-      const { error } = await supabase
-        .from('submissions')
+      const { data, error } = await supabase
+        .from('exercises')
         .delete()
-        .eq('id', submissionId);
+        .eq('id', exerciseId)
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        setAlertModal({
+          type: 'error',
+          message: 'No se encontró el ejercicio o no tienes permisos para eliminarlo.',
+        });
+        return;
+      }
 
-      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
-      setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
       queryClient.setQueryData(['exercises'], (old: any) => {
         if (!old) return [];
         if (Array.isArray(old)) return old.filter((e: any) => e.id !== exercise.id);
@@ -228,6 +206,39 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         return old;
       });
       setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
+    } catch (error) {
+      setAlertModal({ type: 'error', message: 'Ocurrió un error al eliminar el ejercicio.' });
+    }
+  };
+
+
+
+  /* Eliminar una respuesta */
+  const handleDeleteSubmission = async (submissionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('id', submissionId);
+
+      if (error) throw error;
+
+      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
+      setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
+      queryClient.setQueryData(['submissions'], (old: any) => {
+        if (!old) return [];
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== submissionId);
+        if ((old as any).pages) {
+          return {
+            ...old,
+            pages: (old as any).pages.map((page: any) =>
+              page.filter((e: any) => e.id !== exercise.id)
+            ),
+          };
+        }
+        return old;
+      });
+      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
     } catch (error) {
       console.error('Error eliminando respuesta:', error);
       setAlertModal({ type: 'error', message: 'No se pudo eliminar la respuesta.' });
