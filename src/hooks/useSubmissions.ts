@@ -1,8 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useEffect } from "react";
 
 export const useSubmissions = () => {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: ["submissions"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -18,5 +21,20 @@ export const useSubmissions = () => {
       return data;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase.channel("submissions-realtime")
+    .on("postgres_changes",
+      { event: "*", schema: "public", table: "submissions" },
+      () => { queryClient.invalidateQueries({ queryKey: ["submissions"] }) }
+    )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return query;
 };
 

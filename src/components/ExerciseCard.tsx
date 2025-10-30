@@ -160,16 +160,16 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           student:profiles!student_id(id, full_name, email)
         `)
         .eq('exercise_id', exercise.id)
-        
         .order('created_at', { ascending: false });
 
       if (profile?.role === 'student') query.eq('student_id', profile.id);
 
       const { data, error } = await query;
       if (error) throw error;
+      
       setSubmissions(data || []);
     } catch (error) {
-      console.error('Error loading submissions:', error);
+      setAlertModal({ type: 'error', message: 'Ocurrió un error al cargar las respuestas.' });
     }
   };
 
@@ -197,7 +197,6 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       });
       setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
     } catch (error) {
-      console.error('Error eliminando ejercicio:', error);
       setAlertModal({ type: 'error', message: 'Ocurrió un error al eliminar el ejercicio.' });
     }
   };
@@ -208,7 +207,8 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       month: 'long',
       day: 'numeric',
     });
-
+  
+  // console.log(profile?.role === "professor" && );
   return (
     <>
       {modalImage && <ImageModal imageUrl={modalImage} onClose={() => setModalImage(null)} />}
@@ -298,7 +298,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             )}
           </div>
 
-          {profile?.role === 'professor' && profile.id === exercise.professor_id && (
+          {profile?.role === 'professor' && profile?.id === exercise.professor_id && (
             <button
               onClick={() => setConfirmDelete(true)}
               className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
@@ -315,6 +315,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             <div className="mt-4 space-y-3 pt-4 border-t border-[#787e86]">
               {submissions.map((submission) => (
                 <div key={submission.id} className="bg-[#787e86]/20 rounded-lg p-3 md:p-4 border border-[#787e86]">
+
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-[#b7babe] font-medium text-sm md:text-base truncate">
@@ -322,6 +323,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                       </p>
                       <p className="text-xs text-[#84888c] mt-0.5">{formatDate(submission.created_at)}</p>
                     </div>
+                    
                   </div>
                   {submission.image_url && (
                     <img
