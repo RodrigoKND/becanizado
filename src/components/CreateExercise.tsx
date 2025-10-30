@@ -45,7 +45,6 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
         const { error: uploadError } = await supabase.storage
           .from('exercises')
           .upload(fileName, image, {
-            cacheControl: '3600',
             upsert: true,
             contentType: image.type,
           });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
+import { Calendar, Trash2, User, MessageSquare, X, Download, CheckCircle, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { Exercise, Submission, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
@@ -138,18 +138,18 @@ const ImageModal: React.FC<ImageModalProps> = ({ imageUrl, onClose }) => {
     </div>
   );
 };
-
 export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) {
   const { profile } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showSubmissions, setShowSubmissions] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDeleteSubmission, setConfirmDeleteSubmission] = useState<string | null>(null);
   const [alertModal, setAlertModal] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const queryClient = useQueryClient();
   useEffect(() => {
     loadSubmissions();
-  }, [exercise.id]);
+  }, [exercise.id, submissions]);
 
   const loadSubmissions = async () => {
     try {
@@ -175,21 +175,29 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
 
   const handleDeleteExercise = async (exerciseId: string) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('exercises')
         .delete()
         .eq('id', exerciseId)
-        .eq('professor_id', profile?.id);
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        setAlertModal({
+          type: 'error',
+          message: 'No se encontró el ejercicio o no tienes permisos para eliminarlo.',
+        });
+        return;
+      }
+
       queryClient.setQueryData(['exercises'], (old: any) => {
         if (!old) return [];
-        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exerciseId);
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== exercise.id);
         if ((old as any).pages) {
           return {
             ...old,
             pages: (old as any).pages.map((page: any) =>
-              page.filter((e: any) => e.id !== exerciseId)
+              page.filter((e: any) => e.id !== exercise.id)
             ),
           };
         }
@@ -198,6 +206,40 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       setAlertModal({ type: 'success', message: 'Ejercicio eliminado correctamente.' });
     } catch (error) {
       setAlertModal({ type: 'error', message: 'Ocurrió un error al eliminar el ejercicio.' });
+    }
+  };
+
+
+
+  /* Eliminar una respuesta */
+  const handleDeleteSubmission = async (submissionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('id', submissionId);
+
+      if (error) throw error;
+
+      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
+      setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
+      queryClient.setQueryData(['submissions'], (old: any) => {
+        if (!old) return [];
+        if (Array.isArray(old)) return old.filter((e: any) => e.id !== submissionId);
+        if ((old as any).pages) {
+          return {
+            ...old,
+            pages: (old as any).pages.map((page: any) =>
+              page.filter((e: any) => e.id !== exercise.id)
+            ),
+          };
+        }
+        return old;
+      });
+      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
+    } catch (error) {
+      console.error('Error eliminando respuesta:', error);
+      setAlertModal({ type: 'error', message: 'No se pudo eliminar la respuesta.' });
     }
   };
 
@@ -222,6 +264,19 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           }}
         />
       )}
+
+      {/* ⚠️ Confirmar eliminación de respuesta */}
+      {confirmDeleteSubmission && (
+        <ConfirmModal
+          message="¿Estás seguro de que deseas eliminar esta respuesta? Esta acción no se puede deshacer."
+          onCancel={() => setConfirmDeleteSubmission(null)}
+          onConfirm={() => {
+            handleDeleteSubmission(confirmDeleteSubmission);
+            setConfirmDeleteSubmission(null);
+          }}
+        />
+      )}
+
       {alertModal && (
         <AlertModal
           type={alertModal.type}
@@ -231,6 +286,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       )}
 
       <article className="bg-[#3e4145] rounded-xl overflow-hidden border border-[#787e86] hover:border-[#84888c] transition-all duration-300 shadow-lg hover:shadow-xl flex flex-col h-full">
+        {/* Imagen y encabezado */}
         {exercise.image_url && (
           <header
             className="relative overflow-hidden group h-48 bg-[#787e86] bg-opacity-10 cursor-pointer"
@@ -249,6 +305,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           </header>
         )}
 
+        {/* Contenido */}
         <div className="p-4 md:p-5 flex flex-col flex-1">
           <h3 className="text-lg md:text-xl font-bold text-[#b7babe] mb-3 line-clamp-2">{exercise.title}</h3>
 
@@ -273,25 +330,27 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             <button
               onClick={() => setShowSubmissions(!showSubmissions)}
               className="flex items-center justify-center sm:justify-start gap-2 
-      bg-[#2b3238]/50 hover:bg-[#2b3238]/80 text-[#e2e2e2] 
-      transition-colors py-2 px-4 rounded-lg 
-      font-medium text-sm md:text-base shadow-sm hover:shadow-md"
+                bg-[#2b3238]/50 hover:bg-[#2b3238]/80 text-[#e2e2e2] 
+                transition-colors py-2 px-4 rounded-lg 
+                font-medium text-sm md:text-base shadow-sm hover:shadow-md"
             >
               <MessageSquare size={18} />
               <span>
                 {submissions.length} {submissions.length === 1 ? 'Respuesta' : 'Respuestas'}
               </span>
-
-              {showSubmissions ? <span><ChevronUp size={18} fill='#fff' /></span>
-                : <span><ChevronDown size={18} fill='#fff' /></span>}
+              {showSubmissions ? (
+                <ChevronUp size={18} fill="#fff" />
+              ) : (
+                <ChevronDown size={18} fill="#fff" />
+              )}
             </button>
 
             {profile?.role === 'student' && onSubmit && (
               <button
                 onClick={onSubmit}
                 className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] 
-        text-white rounded-lg transition-colors 
-        font-medium text-sm md:text-base shadow-md hover:shadow-lg"
+                  text-white rounded-lg transition-colors 
+                  font-medium text-sm md:text-base shadow-md hover:shadow-lg"
               >
                 Responder
               </button>
@@ -302,15 +361,16 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             <button
               onClick={() => setConfirmDelete(true)}
               className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
-      bg-[#161b1f] hover:bg-[#1f262b] text-white 
-      rounded-lg transition-colors font-medium 
-      text-sm md:text-base shadow-md hover:shadow-lg border border-[#2b3238]"
+                bg-[#161b1f] hover:bg-[#1f262b] text-white 
+                rounded-lg transition-colors font-medium 
+                text-sm md:text-base shadow-md hover:shadow-lg border border-[#2b3238]"
             >
               <X size={18} />
-              Eliminar
+              Eliminar ejercicio
             </button>
           )}
 
+          {/* Mostrar respuestas */}
           {showSubmissions && submissions.length > 0 && (
             <div className="mt-4 space-y-3 pt-4 border-t border-[#787e86]">
               {submissions.map((submission) => (
@@ -325,6 +385,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                     </div>
                     
                   </div>
+
                   {submission.image_url && (
                     <img
                       src={submission.image_url}

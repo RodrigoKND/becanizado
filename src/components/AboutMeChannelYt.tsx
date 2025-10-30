@@ -38,10 +38,16 @@ export default function AboutMeChannelYt() {
                         </p>
                     </div>
 
-                    <Link to="/sobre-mi-canal-yt" className="inline-block mt-4 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-colors shadow-lg font-bold text-white flex gap-4 w-max items-center">
-                        <Youtube size={20} />
-                        Ir al Canal y Suscribirme!
-                    </Link>
+                    <a
+  href="https://www.youtube.com/@BECANIZADO"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block mt-4 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-colors shadow-lg font-bold text-white flex gap-4 w-max items-center"
+>
+  <Youtube size={20} />
+  Ir al Canal y Suscribirme!
+</a>
+
                 </section>
             </div>
         </TemplateDashboard>
