@@ -166,12 +166,10 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
 
       const { data, error } = await query;
       if (error) throw error;
+      
       setSubmissions(data || []);
     } catch (error) {
-      setAlertModal({
-        type: 'error',
-        message: 'Ocurrió un error al cargar las respuestas.',
-      });
+      setAlertModal({ type: 'error', message: 'Ocurrió un error al cargar las respuestas.' });
     }
   };
 
@@ -251,7 +249,8 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       month: 'long',
       day: 'numeric',
     });
-
+  
+  // console.log(profile?.role === "professor" && );
   return (
     <>
       {modalImage && <ImageModal imageUrl={modalImage} onClose={() => setModalImage(null)} />}
@@ -358,8 +357,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             )}
           </div>
 
-          {/* Botón eliminar ejercicio */}
-          {profile?.role === 'professor' && profile.id === exercise.professor_id && (
+          {profile?.role === 'professor' && profile?.id === exercise.professor_id && (
             <button
               onClick={() => setConfirmDelete(true)}
               className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
@@ -377,6 +375,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             <div className="mt-4 space-y-3 pt-4 border-t border-[#787e86]">
               {submissions.map((submission) => (
                 <div key={submission.id} className="bg-[#787e86]/20 rounded-lg p-3 md:p-4 border border-[#787e86]">
+
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-[#b7babe] font-medium text-sm md:text-base truncate">
@@ -384,17 +383,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                       </p>
                       <p className="text-xs text-[#84888c] mt-0.5">{formatDate(submission.created_at)}</p>
                     </div>
-
-                    {/* 🗑️ Botón eliminar respuesta */}
-                    {profile?.role === 'professor' && profile.id === exercise.professor_id && (
-                      <button
-                        onClick={() => setConfirmDeleteSubmission(submission.id)}
-                        title="Eliminar respuesta"
-                        className="p-2 bg-[#161b1f] hover:bg-[#1f262b] text-red-400 rounded-full transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                    
                   </div>
 
                   {submission.image_url && (

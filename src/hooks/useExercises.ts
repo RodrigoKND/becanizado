@@ -1,8 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useEffect } from "react";
 
 export const useExercises = () => {
-    return useQuery({
+    const queryClient = useQueryClient();
+    const query = useQuery({
         queryKey: ["exercises"],
         queryFn: async () => {
             const { data, error } = await supabase
@@ -11,13 +13,30 @@ export const useExercises = () => {
                 .order("created_at", { ascending: false });
 
             if (error) throw error;
+
             return data;
         },
     });
+
+    useEffect(() => {
+        const channel = supabase.channel("exercises-realtime")
+        .on("postgres_changes", 
+            { event: "*", schema: "public", table: "exercises" },
+            () => { queryClient.invalidateQueries({queryKey: ["exercises"]})}
+        )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [queryClient]);
+
+    return query;
 };
 
 export const useLoadExercises = () => {
-    return useQuery({
+    const queryClient = useQueryClient();
+    const query = useQuery({
         queryKey: ["loadExercises"],
         queryFn: async () => {
             const { data, error } = await supabase
@@ -32,4 +51,19 @@ export const useLoadExercises = () => {
             return data;
         },
     });
+
+    useEffect(() => {
+        const channel = supabase.channel("load-exercises-realtime");
+        channel.on("postgres_changes",
+            { event: "*", schema: "public", table: "exercises" },
+            () => { queryClient.invalidateQueries({ queryKey: ["loadExercises"] }) }
+        )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [queryClient]);
+
+    return query;
 };
