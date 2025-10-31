@@ -376,6 +376,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
               {submissions.map((submission) => (
                 <div key={submission.id} className="bg-[#787e86]/20 rounded-lg p-3 md:p-4 border border-[#787e86]">
 
+                  
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-[#b7babe] font-medium text-sm md:text-base truncate">
@@ -384,6 +385,15 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                       <p className="text-xs text-[#84888c] mt-0.5">{formatDate(submission.created_at)}</p>
                     </div>
                     
+                    {profile?.role === 'professor' && (
+                      <button
+                        onClick={() => setConfirmDeleteSubmission(submission.id)}
+                        className="p-2 hover:bg-[#3e4145] rounded-lg transition-colors ml-2"
+                        title="Eliminar respuesta"
+                      >
+                        <Trash2 size={18} className="text-red-400 hover:text-red-300" />
+                      </button>
+                    )}
                   </div>
 
                   {submission.image_url && (
