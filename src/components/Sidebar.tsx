@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Home, LogOut, Youtube, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
+import { MATTERS } from '../data/matters';
+import SelectMatter from './SelectMatter';
 
 export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const { profile, signOut } = useAuth();
@@ -84,6 +86,8 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
               <Youtube size={20} />
               <span className="font-medium">Sobre mi canal YT</span>
             </Link>
+
+            <SelectMatter />
           </div>
         </nav>
 
