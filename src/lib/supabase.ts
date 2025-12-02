@@ -30,6 +30,7 @@ export interface Submission {
   student_id: string;
   image_url: string;
   feedback?: string;
+  text_response?: string;
   created_at: string;
   student?: Profile;
   exercise?: Exercise;
