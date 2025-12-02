@@ -18,6 +18,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const queryClient = useQueryClient();
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

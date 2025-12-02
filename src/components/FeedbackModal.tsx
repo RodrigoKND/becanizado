@@ -40,25 +40,16 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-4 z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-      <div 
-        className="rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
-        style={{ backgroundColor: '#3e4145' }}
-      >
+    <div className="modal-overlay">
+      <div className="modal-card">
         {/* Header del modal */}
-        <div 
-          className="sticky top-0 border-b p-4 sm:p-6 flex items-center justify-between gap-3"
-          style={{ backgroundColor: '#3e4145', borderColor: '#84888c' }}
-        >
-          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: '#b7babe' }}>
+        <div className="modal-header">
+          <h2 className="modal-title">
             Retroalimentación
           </h2>
           <button
             onClick={onClose}
-            className="transition-colors p-1 rounded hover:bg-opacity-80"
-            style={{ color: '#b7babe' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#787e86')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            className="modal-close"
           >
             <X size={24} />
           </button>
@@ -68,14 +59,8 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
         <div className="p-4 sm:p-6">
           {/* Mensaje de éxito */}
           {success && (
-            <div 
-              className="mb-4 p-3 border rounded-lg"
-              style={{ 
-                backgroundColor: 'rgba(120, 126, 134, 0.2)', 
-                borderColor: '#b7babe'
-              }}
-            >
-              <p className="text-sm sm:text-base font-semibold" style={{ color: '#b7babe' }}>
+            <div className="mb-4 p-3 border border-border-color rounded-lg bg-input-bg bg-opacity-20">
+              <p className="text-sm sm:text-base font-semibold text-primary">
                 ✓ ¡Retroalimentación guardada correctamente!
               </p>
             </div>
@@ -83,37 +68,61 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
 
           {/* Información del estudiante */}
           <div className="mb-4 sm:mb-6">
-            <p className="text-xs sm:text-sm mb-2" style={{ color: '#84888c' }}>
+            <p className="text-xs sm:text-sm mb-2 font-semibold uppercase tracking-wide text-secondary">
               Estudiante
             </p>
-            <p className="text-sm sm:text-base font-medium" style={{ color: '#b7babe' }}>
+            <p className="text-sm sm:text-base font-medium text-primary">
               {submission.student?.full_name}
             </p>
           </div>
 
           {/* Respuesta del estudiante */}
           <div className="mb-4 sm:mb-6">
-            <p className="text-xs sm:text-sm mb-2" style={{ color: '#84888c' }}>
+            <p className="text-xs sm:text-sm mb-3 font-semibold uppercase tracking-wide text-secondary">
               Respuesta del estudiante
             </p>
-            <img
-              src={submission.image_url}
-              alt="Respuesta"
-              className="w-full rounded-lg border"
-              style={{ borderColor: '#84888c' }}
-            />
+            
+            <div className="space-y-3">
+              {/* 📝 TEXTO DE RESPUESTA */}
+              {submission.text_response && (
+                <div className="p-3 sm:p-4 rounded-lg border border-border-color bg-card-bg">
+                  <p className="text-xs mb-2 font-semibold uppercase tracking-wide text-secondary">
+                    Texto
+                  </p>
+                  <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed text-primary">
+                    {submission.text_response}
+                  </p>
+                </div>
+              )}
+
+              {/* 🖼 IMAGEN DE RESPUESTA */}
+              {submission.image_url && (
+                <div>
+                  <p className="text-xs mb-2 font-semibold uppercase tracking-wide text-secondary">
+                    Imagen adjunta
+                  </p>
+                  <img
+                    src={submission.image_url}
+                    alt="Respuesta del estudiante"
+                    className="w-full rounded-lg border border-border-color"
+                  />
+                </div>
+              )}
+
+              {/* Mensaje si no hay respuesta */}
+              {!submission.text_response && !submission.image_url && (
+                <div className="p-4 rounded-lg border border-border-color text-center bg-input-bg bg-opacity-10">
+                  <p className="text-sm text-secondary">
+                    El estudiante no proporcionó respuesta
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mensaje de error */}
           {error && (
-            <div 
-              className="mb-4 p-3 border rounded text-sm"
-              style={{ 
-                backgroundColor: 'rgba(220, 38, 38, 0.2)', 
-                borderColor: '#dc2626',
-                color: '#fca5a5'
-              }}
-            >
+            <div className="alert-error">
               {error}
             </div>
           )}
@@ -123,8 +132,7 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
             <div>
               <label 
                 htmlFor="feedback" 
-                className="block text-xs sm:text-sm font-medium mb-2"
-                style={{ color: '#b7babe' }}
+                className="label"
               >
                 Tu retroalimentación
               </label>
@@ -134,29 +142,17 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
                 onChange={(e) => setFeedback(e.target.value)}
                 required
                 rows={6}
-                className="w-full px-3 sm:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent resize-none text-sm sm:text-base"
-                style={{
-                  backgroundColor: '#787e86',
-                  borderColor: '#84888c',
-                  color: '#b7babe',
-                  caretColor: '#b7babe',
-                }}
+                className="textarea"
                 placeholder="Escribe tu retroalimentación aquí..."
               />
             </div>
 
             {/* Botones */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="modal-actions">
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full sm:flex-1 px-4 py-2 sm:py-2.5 border rounded-lg transition-colors text-sm sm:text-base font-medium"
-                style={{ 
-                  borderColor: '#84888c',
-                  color: '#b7babe'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#787e86')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                className="btn-secondary"
               >
                 Cancelar
               </button>
@@ -164,13 +160,7 @@ export default function FeedbackModal({ submission, onClose, onSuccess }: Feedba
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading || !feedback.trim()}
-                className="w-full sm:flex-1 flex items-center justify-center gap-2 font-medium py-2 sm:py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                style={{
-                  backgroundColor: '#787e86',
-                  color: '#b7babe'
-                }}
-                onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#5a5f66')}
-                onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#787e86')}
+                className="btn-primary"
               >
                 <MessageSquare size={20} />
                 <span className="hidden xs:inline sm:inline">{loading ? 'Guardando...' : 'Guardar Retroalimentación'}</span>
