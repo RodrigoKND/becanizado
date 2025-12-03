@@ -3,6 +3,7 @@ import { Home, LogOut, Youtube, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import SelectMatter from './SelectMatter';
 
 export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const { profile, signOut } = useAuth();
@@ -13,12 +14,11 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
-  
+
   return (
     <aside
-      className={`fixed lg:static inset-y-0 left-0 z-50 transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64 xl:w-72 flex-shrink-0`}
+      className={`fixed lg:static inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64 xl:w-72 flex-shrink-0`}
     >
       {/* Botón hamburguesa para móviles */}
       <button
@@ -38,9 +38,8 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
       {/* Sidebar */}
       <div
-        className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-40 w-64 flex flex-col bg-card-bg transform transition-transform duration-300 ease-in-out border border-border-color ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-40 w-64 flex flex-col bg-card-bg transform transition-transform duration-300 ease-in-out border border-border-color ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* HEADER con Logo y Botón de Tema */}
         <div className="p-6 border-b border-border-color">
@@ -61,7 +60,7 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
               </div>
             </div>
           </div>
-          
+
           {/* Botón de Tema */}
           <div className="flex justify-center">
             <ThemeToggle />
@@ -72,9 +71,8 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
           <div className="space-y-2">
             <Link
               to="/dashboard"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-primary ${
-                isActive('/dashboard') ? 'bg-input-bg' : 'hover-bg'
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-primary ${isActive('/dashboard') ? 'bg-input-bg' : 'hover-bg'
+                }`}
               onClick={() => setIsOpen(false)}
             >
               <Home size={20} />
@@ -83,9 +81,8 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
             <Link
               to="/sobre-mi-canal-yt"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-primary ${
-                isActive('/sobre-mi-canal-yt') ? 'bg-input-bg' : 'hover-bg'
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-primary ${isActive('/sobre-mi-canal-yt') ? 'bg-input-bg' : 'hover-bg'
+                }`}
               onClick={() => setIsOpen(false)}
             >
               <Youtube size={20} />
@@ -98,10 +95,13 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
         <div className="p-4 border-t border-border-color">
           <div className="mb-4 p-3 rounded-lg bg-input-bg">
-            <p className="text-sm font-medium text-primary">
+            <p className="text-md font-medium text-primary text-pretty">
               {profile?.full_name}
             </p>
-            <p className="text-xs text-secondary">
+            <p className="text-md text-secondary text-pretty">
+              Rol: {profile?.role}
+            </p>
+            <p className="text-xs text-secondary text-pretty">
               {profile?.email}
             </p>
           </div>
