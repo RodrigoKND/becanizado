@@ -8,7 +8,7 @@ interface HeaderProps {
 export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
   return (
     <header
-      className="min-h-16 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-0 border-b"
+      className="min-h-24 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 sm:py-0 border-b"
       style={{ backgroundColor: '#3e4145', borderColor: '#84888c' }}
     >
       {/* Barra de búsqueda */}
