@@ -30,6 +30,8 @@ export default function TemplateDashboard({
 }: TemplateDashboardProps) {
   const [showCreateExercise, setShowCreateExercise] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const path = window.location.pathname;
+  const route = { youtube: '/sobre-mi-canal-yt' };
 
   return (
     <section className="min-h-screen bg-[#3e4145] flex">
@@ -43,7 +45,7 @@ export default function TemplateDashboard({
 
       <Sidebar sidebarOpen={sidebarOpen} />
 
-      <div className="flex-1 flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <Header searchQuery={searchQuery || ''} onSearchChange={setSearchQuery!} />
 
         {/* Botón flotante solo para mobile */}
@@ -58,55 +60,49 @@ export default function TemplateDashboard({
         )}
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 md:p-6 lg:p-8">
-            
-            {/* Contenido principal */}
-            <div className="lg:col-span-2 xl:col-span-3">{children}</div>
+          <div className="w-full max-w-[100%] mx-auto px-4 md:px-6 py-6">
+            <div className={`grid grid-cols-1 lg:grid-cols-[1fr_${path !== route.youtube ? '300px': '100px'}] gap-6`}>
+              <div className="w-full">{children}</div>
 
-            {/* Columna derecha (desktop) */}
-            <div className="hidden lg:block lg:col-span-1">
-              <div className="sticky top-20 space-y-6">
+              {path !== route.youtube && (
+                <div className="hidden lg:block">
+                  <div className="sticky top-20 space-y-6">
+                    {/* Perfil rápido */}
+                    <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
+                      <h3 className="text-lg font-bold text-[#b7babe] mb-3 border-b border-[#787e86]/30 pb-2">
+                        Bienvenido {profile?.role === 'professor' ? 'profesor' : profile?.full_name}
+                      </h3>
+                      <p className="text-[#84888c] text-sm">{profile?.email}</p>
+                      <p className="text-[#84888c] text-sm capitalize">
+                        Rol: {profile?.role}
+                      </p>
+                    </div>
 
-                {/* Perfil rápido */}
-                <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
-                  <h3 className="text-lg font-bold text-[#b7babe] mb-3 border-b border-[#787e86]/30 pb-2">
-                    Bienvenido {profile?.role === 'professor' ? 'profesor' : profile?.full_name}
-                  </h3>
-                  <p className="text-[#84888c] text-sm">{profile?.email}</p>
-                  <p className="text-[#84888c] text-sm capitalize">
-                    Rol: {profile?.role}
-                  </p>
-                </div>
-
-                {/* Acciones profesor */}
-                {profile?.role === 'professor' && (
-                  <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
-                    <h3 className="text-lg font-bold text-[#b7babe] mb-3">Acciones</h3>
-                    <button
-                      onClick={() => setShowCreateExercise(true)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#151B26] hover:bg-[#151B26] text-white rounded-xl transition-colors font-bold shadow-lg"
-                    >
-                      <Plus size={20} />
-                      Crear Nuevo Ejercicio
-                    </button>
+                    {/* Acciones profesor */}
+                    {profile?.role === 'professor' && (
+                      <div className="bg-[#3e4145] rounded-xl p-4 shadow-xl border border-[#787e86]/50">
+                        <h3 className="text-lg font-bold text-[#b7babe] mb-3">Acciones</h3>
+                        <button
+                          onClick={() => setShowCreateExercise(true)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#151B26] hover:bg-[#151B26] text-white rounded-xl transition-colors font-bold shadow-lg"
+                        >
+                          <Plus size={20} />
+                          Crear Nuevo Ejercicio
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-
-              </div>
+                </div>
+              )}
             </div>
-
           </div>
         </div>
       </div>
 
       {/* Modales */}
       {showCreateExercise && (
-        <CreateExercise
-          onClose={() => setShowCreateExercise(false)}
-          onSuccess={() => {}}
-        />
+        <CreateExercise onClose={() => setShowCreateExercise(false)} onSuccess={() => {}} />
       )}
-
       {selectedExercise && (
         <SubmitExercise
           exerciseId={selectedExercise}
@@ -114,7 +110,6 @@ export default function TemplateDashboard({
           onSuccess={() => {}}
         />
       )}
-
       {selectedSubmission && (
         <FeedbackModal
           submission={selectedSubmission}
@@ -125,3 +120,4 @@ export default function TemplateDashboard({
     </section>
   );
 }
+
