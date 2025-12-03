@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload, Send, FileImage } from 'lucide-react';
+import { X, Upload, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -85,13 +85,13 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-[#3e4145] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-[#787e86]">
+    <div className="modal-overlay">
+      <div className="modal-card">
         
         {/* HEADER */}
-        <div className="bg-[#787e86] bg-opacity-10 border-b border-[#787e86] p-4 md:p-6 flex items-center justify-between">
-          <h2 className="text-xl md:text-2xl font-bold text-[#b7babe]">Enviar Respuesta</h2>
-          <button onClick={onClose} className="text-[#84888c] hover:text-[#b7babe] p-2">
+        <div className="modal-header">
+          <h2 className="modal-title">Enviar Respuesta</h2>
+          <button onClick={onClose} className="modal-close">
             <X size={24} />
           </button>
         </div>
@@ -100,21 +100,21 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
 
           {/* ÉXITO */}
           {success && (
-            <div className="p-4 bg-[#787e86] bg-opacity-20 border border-[#b7babe] rounded-lg">
-              <p className="text-[#b7babe] font-semibold">✓ ¡Respuesta enviada correctamente!</p>
+            <div className="p-4 bg-input-bg bg-opacity-20 border border-border-color rounded-lg">
+              <p className="text-primary font-semibold">✓ ¡Respuesta enviada correctamente!</p>
             </div>
           )}
 
           {/* ERROR */}
           {error && (
-            <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
-              <p className="text-red-200">{error}</p>
+            <div className="alert-error">
+              {error}
             </div>
           )}
 
           {/* RESPUESTA EN TEXTO */}
           <div>
-            <label className="block text-sm font-semibold text-[#b7babe] mb-2">
+            <label className="label">
               Respuesta en texto (opcional)
             </label>
             <textarea
@@ -122,35 +122,36 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
               onChange={(e) => setTextResponse(e.target.value)}
               rows={4}
               placeholder="Escribe tu respuesta aquí..."
-              className="w-full p-3 rounded-xl bg-[#2a2c2e] text-[#b7babe] border border-[#787e86] focus:border-[#b7babe] outline-none"
+              className="textarea"
             />
           </div>
 
           {/* IMAGEN */}
           <div>
-            <label className="block text-sm font-semibold text-[#b7babe] mb-3">
+            <label className="label">
               Imagen de tu respuesta (opcional)
             </label>
 
-            <div className="border-2 border-dashed border-[#787e86] rounded-xl p-6 text-center bg-[#787e86] bg-opacity-5">
+            <div className="image-upload">
               {imagePreview ? (
-                <div className="relative group">
+                <div className="image-preview">
                   <img
                     src={imagePreview}
+                    alt="Vista previa"
                     className="max-h-64 mx-auto rounded-xl shadow-lg"
                   />
                   <button
                     type="button"
                     onClick={() => { setImage(null); setImagePreview(''); }}
-                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full"
+                    className="image-remove"
                   >
                     <X size={18} />
                   </button>
                 </div>
               ) : (
-                <label className="cursor-pointer block">
-                  <Upload className="mx-auto mb-3 text-[#b7babe]" size={48} />
-                  <p className="text-[#b7babe] font-semibold">Haz clic para subir imagen</p>
+                <label className="upload-label cursor-pointer block">
+                  <Upload className="upload-icon mx-auto mb-3" size={48} />
+                  <p className="text-primary font-semibold">Haz clic para subir imagen</p>
                   <input
                     type="file"
                     accept="image/*"
@@ -163,19 +164,23 @@ export default function SubmitExercise({ exerciseId, onClose, onSuccess }: Submi
           </div>
 
           {/* BOTONES */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button onClick={onClose} className="flex-1 border border-[#787e86] text-[#b7babe] p-3 rounded-xl">
+          <div className="modal-actions">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary"
+            >
               Cancelar
             </button>
 
             <button
-              type="submit"
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 bg-[#787e86] hover:bg-[#84888c] text-[#3e4145] font-bold p-3 rounded-xl"
+              className="btn-primary"
             >
-              <Send size={20} className="inline-block" />
-              {loading ? ' Enviando...' : ' Enviar Respuesta'}
+              <Send size={20} />
+              {loading ? 'Enviando...' : 'Enviar Respuesta'}
             </button>
           </div>
 
