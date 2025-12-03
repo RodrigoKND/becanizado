@@ -22,6 +22,7 @@ export interface Exercise {
   image_url?: string;
   created_at: string;
   professor?: Profile;
+  matter?: string;
 }
 
 export interface Submission {

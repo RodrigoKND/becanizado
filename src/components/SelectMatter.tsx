@@ -1,15 +1,32 @@
 import { MATTERS } from "../data/matters";
 
-export default function SelectMatter() {
+interface SelectMatterProps {
+    title?: string;
+    value: string;
+    onChange: (matter: string) => void;
+}
+
+export default function SelectMatter({ title, value, onChange }: SelectMatterProps) {
     return (
-        <select className="w-full p-4 py-2 cursor-pointer rounded-md text-gray-800" >
-            {
-                MATTERS.map((matter) => (
-                    <option key={matter} value={matter}>
-                        {matter}
-                    </option>
-                ))
-            }
-        </select>
+        <div>
+            <label htmlFor="matter-filter" className="label">
+                {title || 'Filtrar por materia'}
+            </label>
+            <select 
+                id="matter-filter"
+                className="input w-full cursor-pointer"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            >
+                <option value="">Todas las materias</option>
+                {
+                    MATTERS.sort((a,b) => a.localeCompare(b)).map((matter) => (
+                        <option key={matter} value={matter}>
+                            {matter}
+                        </option>
+                    ))
+                }
+            </select>
+        </div>
     );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Filter, Clock, CheckCircle, MessageSquare } from 'lucide-react';
 import { Submission } from '../lib/supabase';
 import ExerciseCard from "./ExerciseCard";
+import SelectMatter from "./SelectMatter";
 import { useExercises } from "../hooks/useExercises";
 
 type FilterType = 'all' | 'student' | 'exercise';
@@ -82,15 +83,24 @@ export default function AnswersAndExercises({
 }: ExerciseCardProps) {
 
     const [filterType, setFilterType] = useState<FilterType>('all');
-    
-    const { data: exercise } = useExercises();
-    const filteredExercises = exercise?.filter((exercise) => {
-        if (!searchQuery) return true;
-        const query = searchQuery.toLowerCase();
-        return exercise.title.toLowerCase().includes(query) ||
-            exercise.description.toLowerCase().includes(query) ||
-            exercise.profiles[0]?.full_name.toLowerCase().includes(query);
+    const [selectedMatter, setSelectedMatter] = useState<string>('');
+
+    const { data: exercises } = useExercises();
+    const filteredExercises = exercises?.filter((exercise) => {
+        const query = searchQuery?.toLowerCase() || '';
+        const matchesSearch =
+            !query ||
+            exercise.title?.toLowerCase().includes(query) ||
+            exercise.description?.toLowerCase().includes(query) ||
+            exercise.profiles?.some((p: { full_name?: string }) =>
+                p.full_name?.toLowerCase().includes(query)
+            );
+
+        const matchesMatter = !selectedMatter || exercise.matter === selectedMatter;
+
+        return matchesSearch && matchesMatter;
     });
+
 
     const filteredSubmissions = submissions.filter((submission) => {
         if (!searchQuery) return true;
@@ -115,7 +125,6 @@ export default function AnswersAndExercises({
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {/* Aquí usamos el nuevo SubmissionPost con estilo de 'Tweet' o 'Pregunta' */}
                             {filteredSubmissions.map((submission) => (
                                 <SubmissionPost
                                     key={submission.id}
@@ -129,21 +138,28 @@ export default function AnswersAndExercises({
             );
         }
         return (
-            <div className="space-y-4">
-                <h2 className="text-xl font-bold text-primary mb-6 border-b border-border-color pb-3">
-                    {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
-                </h2>
+            <section className="space-y-4">
+                <header className="flex items-center justify-between gap-8 mb-6">
+                    <h2 className="text-xl font-bold text-primary border-b border-border-color pb-3 flex-1">
+                        {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
+                    </h2>
+
+                    {/* Selector de materia */}
+                    <SelectMatter
+                        value={selectedMatter}
+                        onChange={setSelectedMatter}
+                    />
+                </header>
+
                 {filteredExercises?.length === 0 ? (
                     <div className="text-center py-12 text-secondary bg-card-bg rounded-xl p-6">
-                        {searchQuery
-                            ? 'No se encontraron ejercicios con tu búsqueda.'
+                        {searchQuery || selectedMatter
+                            ? 'No se encontraron ejercicios con los filtros seleccionados.'
                             : 'No hay ejercicios disponibles para mostrar en el feed.'}
                     </div>
                 ) : (
-                    // Usamos una columna única para el 'feed' de tarjetas
                     <div className="space-y-4">
                         {filteredExercises?.map((exercise) => (
-                            // ExerciseCard debería tener un diseño más vertical y enfocado al contenido (tipo Brainly)
                             <ExerciseCard
                                 key={exercise.id}
                                 exercise={exercise}
@@ -156,14 +172,14 @@ export default function AnswersAndExercises({
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         );
     };
 
     return (
-        <div className="lg:col-span-2 xl:col-span-3">
+        <section className="lg:col-span-2 xl:col-span-3">
             {/* Encabezado Principal y Filtros */}
-            <div className="bg-card-bg sticky top-0 z-10 pt-1 pb-4 mb-4">
+            <header className="bg-card-bg sticky top-0 z-10 pt-1 pb-4 mb-4">
                 <h3 className="text-2xl md:text-3xl font-normal text-primary mb-1">
                     Inicio
                 </h3>
@@ -197,10 +213,10 @@ export default function AnswersAndExercises({
                         </button>
                     </div>
                 )}
-            </div>
+            </header>
 
             {/* Contenido del Feed (Ejercicios o Respuestas) */}
             {getFilteredContent()}
-        </div>
+        </section>
     );
 }

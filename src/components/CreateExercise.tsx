@@ -3,6 +3,7 @@ import { X, Upload, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { MATTERS } from '../data/matters';
 
 interface CreateExerciseProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
   const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [matter, setMatter] = useState(MATTERS[0]);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -59,12 +61,13 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
         imageUrl = publicData.publicUrl;
       }
 
-      const { data:insertedData, error: insertError } = await supabase
+      const { data: insertedData, error: insertError } = await supabase
         .from('exercises')
         .insert({
           professor_id: user.id,
           title,
           description,
+          matter,
           image_url: imageUrl || null,
         }).select().single();
 
@@ -104,7 +107,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
 
         {error && <div className="alert-error">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="modal-form">
+        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-80px)]">
           <div>
             <label htmlFor="title" className="label">
               Título del ejercicio
@@ -118,6 +121,25 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
               className="input"
               placeholder="Ej: Ejercicio de Álgebra #1"
             />
+          </div>
+
+          <div>
+            <label htmlFor="matter" className="label">
+              Materia
+            </label>
+            <select
+              id="matter"
+              value={matter}
+              onChange={(e) => setMatter(e.target.value)}
+              required
+              className="input cursor-pointer"
+            >
+              {MATTERS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -153,7 +175,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
                   </button>
                 </div>
               ) : (
-                <label className="upload-label">
+                <label className="upload-label cursor-pointer">
                   <Upload size={48} className="upload-icon" />
                   <p>Haz clic para subir una imagen</p>
                   <input
@@ -176,7 +198,8 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
               Cancelar
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={loading}
               className="btn-primary"
             >
@@ -184,7 +207,7 @@ export default function CreateExercise({ onClose, onSuccess }: CreateExercisePro
               {loading ? 'Creando...' : 'Crear Ejercicio'}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

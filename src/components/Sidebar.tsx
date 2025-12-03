@@ -4,11 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import SelectMatter from './SelectMatter';
+import { useMatter } from '../contexts/MatterContext';
 
 export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const { profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const location = useLocation();
@@ -16,7 +17,7 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <aside
+    <section
       className={`fixed lg:static inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 transition-transform duration-300 ease-in-out lg:w-64 xl:w-72 flex-shrink-0`}
     >
@@ -37,12 +38,12 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
       )}
 
       {/* Sidebar */}
-      <div
+      <aside
         className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-40 w-64 flex flex-col bg-card-bg transform transition-transform duration-300 ease-in-out border border-border-color ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           }`}
       >
         {/* HEADER con Logo y Botón de Tema */}
-        <div className="p-6 border-b border-border-color">
+        <header className="p-6 border-b border-border-color">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
               <img
@@ -65,7 +66,7 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
           <div className="flex justify-center">
             <ThemeToggle />
           </div>
-        </div>
+        </header>
 
         <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-2">
@@ -89,7 +90,6 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
               <span className="font-medium">Sobre mi canal YT</span>
             </Link>
 
-            <SelectMatter />
           </div>
         </nav>
 
@@ -116,7 +116,7 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
             <span className="font-medium">Cerrar sesión</span>
           </button>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </section>
   );
 }
