@@ -1,7 +1,7 @@
-import { Youtube } from 'lucide-react';
 import TemplateDashboard from "./TemplateDashboard";
 import { useAuth } from '../contexts/AuthContext';
 import { useFetch } from '../hooks/useFetch';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Videos {
     id: string;
@@ -12,12 +12,17 @@ interface Videos {
 
 export default function AboutMeChannelYt() {
     const { profile } = useAuth();
+    const { theme } = useTheme();
+
     const { data: videos, loading, error } = useFetch("https://rss.app/feeds/v1.1/Q1cLKorlbqMyux3c.json");
     return (
         <TemplateDashboard profile={profile}>
             <section className="w-full lg:col-span-4 xl:col-span-4">
                 <div className="w-fu<ll">
-                    <h2 className="text-3xl text-center font-bold mb-6 text-gray-800 dark:text-gray-200">
+                    <h2 className="text-3xl text-center font-bold mb-6"
+                    style={{
+                        color: theme === 'light' ? '#1f2937' : '#b7babe'
+                    }}>
                         @Becanizado
                     </h2>
 
@@ -32,7 +37,7 @@ export default function AboutMeChannelYt() {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="relative max-w-[250px] rounded-lg overflow-hidden shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
+                                    className="relative lg:max-w-[250px] max-w-md rounded-lg overflow-hidden shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
                                 >
                                     {/* Imagen del video */}
                                     <img
