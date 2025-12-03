@@ -84,22 +84,22 @@ export default function AnswersAndExercises({
 
     const [filterType, setFilterType] = useState<FilterType>('all');
     const [selectedMatter, setSelectedMatter] = useState<string>('');
-    
-const { data: exercises } = useExercises();
-const filteredExercises = exercises?.filter((exercise) => {
-  const query = searchQuery?.toLowerCase() || '';
-  const matchesSearch =
-    !query ||
-    exercise.title?.toLowerCase().includes(query) ||
-    exercise.description?.toLowerCase().includes(query) ||
-    exercise.profiles?.some((p: { full_name?: string }) =>
-      p.full_name?.toLowerCase().includes(query)
-    );
 
-  const matchesMatter = !selectedMatter || exercise.matter === selectedMatter;
+    const { data: exercises } = useExercises();
+    const filteredExercises = exercises?.filter((exercise) => {
+        const query = searchQuery?.toLowerCase() || '';
+        const matchesSearch =
+            !query ||
+            exercise.title?.toLowerCase().includes(query) ||
+            exercise.description?.toLowerCase().includes(query) ||
+            exercise.profiles?.some((p: { full_name?: string }) =>
+                p.full_name?.toLowerCase().includes(query)
+            );
 
-  return matchesSearch && matchesMatter;
-});
+        const matchesMatter = !selectedMatter || exercise.matter === selectedMatter;
+
+        return matchesSearch && matchesMatter;
+    });
 
 
     const filteredSubmissions = submissions.filter((submission) => {
@@ -138,20 +138,18 @@ const filteredExercises = exercises?.filter((exercise) => {
             );
         }
         return (
-            <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <section className="space-y-4">
+                <header className="flex items-center justify-between gap-4 mb-6">
                     <h2 className="text-xl font-bold text-primary border-b border-border-color pb-3 flex-1">
                         {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
                     </h2>
-                    
+
                     {/* Selector de materia */}
-                    <div className="w-full sm:w-64">
-                        <SelectMatter 
-                            value={selectedMatter} 
-                            onChange={setSelectedMatter} 
-                        />
-                    </div>
-                </div>
+                    <SelectMatter
+                        value={selectedMatter}
+                        onChange={setSelectedMatter}
+                    />
+                </header>
 
                 {filteredExercises?.length === 0 ? (
                     <div className="text-center py-12 text-secondary bg-card-bg rounded-xl p-6">
@@ -174,14 +172,14 @@ const filteredExercises = exercises?.filter((exercise) => {
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         );
     };
 
     return (
-        <div className="lg:col-span-2 xl:col-span-3">
+        <section className="lg:col-span-2 xl:col-span-3">
             {/* Encabezado Principal y Filtros */}
-            <div className="bg-card-bg sticky top-0 z-10 pt-1 pb-4 mb-4">
+            <header className="bg-card-bg sticky top-0 z-10 pt-1 pb-4 mb-4">
                 <h3 className="text-2xl md:text-3xl font-normal text-primary mb-1">
                     Inicio
                 </h3>
@@ -215,10 +213,10 @@ const filteredExercises = exercises?.filter((exercise) => {
                         </button>
                     </div>
                 )}
-            </div>
+            </header>
 
             {/* Contenido del Feed (Ejercicios o Respuestas) */}
             {getFilteredContent()}
-        </div>
+        </section>
     );
 }
