@@ -139,7 +139,7 @@ export default function AnswersAndExercises({
         }
         return (
             <section className="space-y-4">
-                <header className="flex items-center justify-between gap-4 mb-6">
+                <header className="flex items-center justify-between gap-8 mb-6">
                     <h2 className="text-xl font-bold text-primary border-b border-border-color pb-3 flex-1">
                         {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
                     </h2>
