@@ -91,6 +91,8 @@ export default function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
               <Youtube size={20} />
               <span className="font-medium">Sobre mi canal YT</span>
             </Link>
+
+            <SelectMatter />
           </div>
         </nav>
 

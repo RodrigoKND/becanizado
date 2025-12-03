@@ -30,6 +30,8 @@ export default function TemplateDashboard({
 }: TemplateDashboardProps) {
   const [showCreateExercise, setShowCreateExercise] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const path = window.location.pathname;
+  const route = { youtube: '/sobre-mi-canal-yt' };
 
   return (
     <section className="min-h-screen bg-card-bg flex">
@@ -44,7 +46,7 @@ export default function TemplateDashboard({
 
       <Sidebar sidebarOpen={sidebarOpen} />
 
-      <div className="flex-1 flex flex-col w-full">
+      <div className="flex flex-col w-full">
         <Header searchQuery={searchQuery || ''} onSearchChange={setSearchQuery!} />
 
         {/* Botón flotante para TODOS (mobile) */}
@@ -57,12 +59,11 @@ export default function TemplateDashboard({
         </button>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 md:p-6 lg:p-8">
-            
-            {/* Contenido principal */}
-            <div className="lg:col-span-2 xl:col-span-3">{children}</div>
-
-            {/* Columna derecha */}
+          <div className="w-full max-w-[100%] mx-auto px-4 md:px-6 py-6">
+            <div className={`grid grid-cols-1 lg:grid-cols-[1fr_${path !== route.youtube ? '300px': '100px'}] gap-6`}>
+              <div className="w-full">{children}</div>
+              {path !== route.youtube && (
+                {/* Columna derecha */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="sticky top-20 space-y-6">
 
@@ -90,20 +91,16 @@ export default function TemplateDashboard({
                 </div>
 
               </div>
+              )}
             </div>
-
           </div>
         </div>
       </div>
 
       {/* Modales */}
       {showCreateExercise && (
-        <CreateExercise
-          onClose={() => setShowCreateExercise(false)}
-          onSuccess={() => {}}
-        />
+        <CreateExercise onClose={() => setShowCreateExercise(false)} onSuccess={() => {}} />
       )}
-
       {selectedExercise && (
         <SubmitExercise
           exerciseId={selectedExercise}
@@ -111,7 +108,6 @@ export default function TemplateDashboard({
           onSuccess={() => {}}
         />
       )}
-
       {selectedSubmission && (
         <FeedbackModal
           submission={selectedSubmission}
@@ -122,3 +118,4 @@ export default function TemplateDashboard({
     </section>
   );
 }
+
