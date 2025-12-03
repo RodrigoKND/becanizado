@@ -20,7 +20,7 @@ export default function SelectMatter({ title, value, onChange }: SelectMatterPro
             >
                 <option value="">Todas las materias</option>
                 {
-                    MATTERS.map((matter) => (
+                    MATTERS.sort((a,b) => a.localeCompare(b)).map((matter) => (
                         <option key={matter} value={matter}>
                             {matter}
                         </option>
