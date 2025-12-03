@@ -3,67 +3,85 @@ import { supabase } from "../lib/supabase";
 import { useEffect } from "react";
 
 export const useExercises = () => {
-    const queryClient = useQueryClient();
-    const query = useQuery({
-        queryKey: ["exercises"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("exercises")
-                .select("id, title, professor_id, description, image_url, created_at, profiles(full_name)")
-                .order("created_at", { ascending: false });
+  const queryClient = useQueryClient();
 
-            if (error) throw error;
+  const query = useQuery({
+    queryKey: ["exercises"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select(`
+          id,
+          title,
+          description,
+          image_url,
+          created_at,
+          matter,
+          professor_id,
+          profiles(full_name)
+        `)
+        .order("created_at", { ascending: false });
 
-            return data;
-        },
-    });
+      if (error) throw error;
+      return data;
+    },
+  });
 
-    useEffect(() => {
-        const channel = supabase.channel("exercises-realtime")
-        .on("postgres_changes", 
-            { event: "*", schema: "public", table: "exercises" },
-            () => { queryClient.invalidateQueries({queryKey: ["exercises"]})}
-        )
-            .subscribe();
+  useEffect(() => {
+    const channel = supabase
+      .channel("exercises-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "exercises" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["exercises"] });
+        }
+      )
+      .subscribe();
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [queryClient]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
-    return query;
+  return query;
 };
 
 export const useLoadExercises = () => {
-    const queryClient = useQueryClient();
-    const query = useQuery({
-        queryKey: ["loadExercises"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from('exercises')
-                .select(`
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ["loadExercises"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select(`
           *,
           professor:profiles!professor_id(id, full_name, email, youtube_channel)
         `)
-                .order('created_at', { ascending: false });
+        .order("created_at", { ascending: false });
 
-            if (error) throw error;
-            return data;
-        },
-    });
+      if (error) throw error;
+      return data;
+    },
+  });
 
-    useEffect(() => {
-        const channel = supabase.channel("load-exercises-realtime");
-        channel.on("postgres_changes",
-            { event: "*", schema: "public", table: "exercises" },
-            () => { queryClient.invalidateQueries({ queryKey: ["loadExercises"] }) }
-        )
-            .subscribe();
+  useEffect(() => {
+    const channel = supabase
+      .channel("load-exercises-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "exercises" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["loadExercises"] });
+        }
+      )
+      .subscribe();
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [queryClient]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
-    return query;
+  return query;
 };
