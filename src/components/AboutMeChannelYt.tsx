@@ -1,55 +1,63 @@
-import { Link } from "react-router-dom";
-import { Youtube } from 'lucide-react';
 import TemplateDashboard from "./TemplateDashboard";
 import { useAuth } from '../contexts/AuthContext';
+import { useFetch } from '../hooks/useFetch';
+
+interface Videos {
+    id: string;
+    url: string;
+    title: string;
+    attachments: { url: string }[];
+}
 
 export default function AboutMeChannelYt() {
     const { profile } = useAuth();
+    const { data: videos, loading, error } = useFetch("https://rss.app/feeds/v1.1/Q1cLKorlbqMyux3c.json");
     return (
         <TemplateDashboard profile={profile}>
-            <div className="w-full lg:col-span-2 xl:col-span-3">
-                <section className="w-full mx-auto py-10">
-                    <div className="space-y-4 max-w-3xl">
-                        <h2 className="text-3xl font-bold text-white">
-                            Sobre el canal de <span className="text-[#00e0ff]">@Becanizado</span>
-                        </h2>
+            <section className="w-full lg:col-span-4 xl:col-span-4">
+                <div className="w-fu<ll">
+                    <h2 className="text-3xl text-center font-bold mb-6 text-gray-800 dark:text-gray-200">
+                        @Becanizado
+                    </h2>
 
-                        <p className="text-[#d8dbdf] text-lg leading-relaxed">
-                            Este canal está pensado exclusivamente para apoyar a mis alumnos en su aprendizaje.
-                            Aquí podrás encontrar explicaciones claras, ejercicios resueltos paso a paso y
-                            contenido complementario a lo que trabajamos en clase.
-                        </p>
+                    {loading && <p className="text-center text-gray-500">Cargando videos...</p>}
+                    {error && <p className="text-center text-red-500">{error}</p>}
 
-                        <p className="text-[#d8dbdf] text-lg leading-relaxed">
-                            La idea es que puedan repasar los temas a su propio ritmo, reforzar los conceptos
-                            que aún generan dudas y prepararse mejor para exámenes y tareas sin estrés.
-                        </p>
+                    {!loading && !error && (
+                        <div className="flex flex-wrap justify-center overflow-hidden gap-4">
+                            {videos?.items?.map(({ id, url, title, attachments }: Videos) => (
+                                <a
+                                    key={id}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="relative max-w-[250px] rounded-lg overflow-hidden shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
+                                >
+                                    {/* Imagen del video */}
+                                    <img
+                                        src={attachments?.[0]?.url}
+                                        alt={title}
+                                        className="w-full h-60 object-cover"
+                                    />
 
-                        <ol className="space-y-2 text-[#b7babe] text-base">
-                            <li>1. Apoyo directo a los temas vistos en clase</li>
-                            <li>2. Explicaciones breves, precisas y entendibles</li>
-                            <li>3. Ejercicios guía para que puedan practicar</li>
-                            <li>4. Contenido disponible cuando lo necesiten</li>
-                        </ol>
+                                    {/* Overlay degradado para texto */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-end p-4">
+                                        <h3 className="text-white font-semibold text-lg line-clamp-2">
+                                            {title}
+                                        </h3>
+                                    </div>
 
-                        <p className="text-[#d8dbdf] text-md">
-                            Una vez se publiquen los primeros videos, compartiré el enlace aquí mismo para que
-                            tengan acceso directo al material.
-                        </p>
-                    </div>
-
-                    <a
-  href="https://www.youtube.com/@BECANIZADO"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-block mt-4 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-colors shadow-lg font-bold text-white flex gap-4 w-max items-center"
->
-  <Youtube size={20} />
-  Ir al Canal y Suscribirme!
-</a>
-
-                </section>
-            </div>
+                                    {/* Badge minimalista */}
+                                    <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
+                                        Matemáticas
+                                    </span>
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
         </TemplateDashboard>
+
     );
 }
