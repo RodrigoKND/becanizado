@@ -1,3 +1,4 @@
+import { Youtube } from 'lucide-react';
 import TemplateDashboard from "./TemplateDashboard";
 import { useAuth } from '../contexts/AuthContext';
 import { useFetch } from '../hooks/useFetch';

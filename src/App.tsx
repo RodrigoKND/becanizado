@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext'; // ← IMPORTAR
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -29,11 +30,13 @@ function AppContent() {
 
 export default function App() {
   return (
-    <CacheProvider>
-      <AuthProvider>
-        <AppContent />
-        <Analytics mode='production' />
-      </AuthProvider>
-    </CacheProvider>
+    <ThemeProvider> 
+      <CacheProvider>
+        <AuthProvider>
+          <AppContent />
+          <Analytics mode='production' />
+        </AuthProvider>
+      </CacheProvider>
+    </ThemeProvider>
   );
 }

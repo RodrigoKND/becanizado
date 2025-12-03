@@ -33,21 +33,21 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ message, onConfirm, onCance
     onClick={onCancel}
   >
     <div
-      className="bg-[#3e4145] border border-[#787e86] rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"
+      className="bg-card-bg border border-border-color rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"
       onClick={(e) => e.stopPropagation()}
     >
-      <h2 className="text-lg font-semibold text-[#b7babe] mb-3">Confirmar acción</h2>
-      <p className="text-[#b7babe] mb-6">{message}</p>
+      <h2 className="text-lg font-semibold text-primary mb-3">Confirmar acción</h2>
+      <p className="text-primary mb-6">{message}</p>
       <div className="flex justify-center gap-3">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-[#161b1f] hover:bg-[#1f262b] text-[#b7babe] rounded-lg border border-[#2b3238] transition-colors"
+          className="btn-secondary"
         >
           Cancelar
         </button>
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] text-white rounded-lg transition-colors"
+          className="btn-primary"
         >
           Eliminar
         </button>
@@ -63,7 +63,7 @@ const AlertModal: React.FC<AlertModalProps> = ({ type, message, onClose }) => (
     onClick={onClose}
   >
     <div
-      className="bg-[#3e4145] border border-[#787e86] rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"
+      className="bg-card-bg border border-border-color rounded-xl p-6 max-w-sm w-full text-center shadow-2xl"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex flex-col items-center justify-center mb-3">
@@ -72,14 +72,14 @@ const AlertModal: React.FC<AlertModalProps> = ({ type, message, onClose }) => (
         ) : (
           <AlertCircle size={40} className="text-red-400 mb-2" />
         )}
-        <h2 className="text-lg font-semibold text-[#b7babe]">
+        <h2 className="text-lg font-semibold text-primary">
           {type === 'success' ? 'Éxito' : 'Error'}
         </h2>
       </div>
-      <p className="text-[#b7babe] mb-6">{message}</p>
+      <p className="text-primary mb-6">{message}</p>
       <button
         onClick={onClose}
-        className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] text-white rounded-lg transition-colors"
+        className="btn-primary"
       >
         Aceptar
       </button>
@@ -112,7 +112,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ imageUrl, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="relative bg-[#3e4145] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+        className="relative bg-card-bg rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative h-full w-full">
@@ -138,6 +138,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ imageUrl, onClose }) => {
     </div>
   );
 };
+
 export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) {
   const { profile } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -147,6 +148,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
   const [confirmDeleteSubmission, setConfirmDeleteSubmission] = useState<string | null>(null);
   const [alertModal, setAlertModal] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const queryClient = useQueryClient();
+  
   useEffect(() => {
     loadSubmissions();
   }, [exercise.id, submissions]);
@@ -162,11 +164,9 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         .eq('exercise_id', exercise.id)
         .order('created_at', { ascending: false });
 
-      if (profile?.role === 'student') query.eq('student_id', profile.id);
-
       const { data, error } = await query;
       if (error) throw error;
-      
+
       setSubmissions(data || []);
     } catch (error) {
       setAlertModal({ type: 'error', message: 'Ocurrió un error al cargar las respuestas.' });
@@ -209,9 +209,6 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
     }
   };
 
-
-
-  /* Eliminar una respuesta */
   const handleDeleteSubmission = async (submissionId: string) => {
     try {
       const { error } = await supabase
@@ -236,7 +233,6 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         }
         return old;
       });
-      setAlertModal({ type: 'success', message: 'Respuesta eliminada correctamente.' });
     } catch (error) {
       console.error('Error eliminando respuesta:', error);
       setAlertModal({ type: 'error', message: 'No se pudo eliminar la respuesta.' });
@@ -249,8 +245,7 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
       month: 'long',
       day: 'numeric',
     });
-  
-  // console.log(profile?.role === "professor" && );
+
   return (
     <>
       {modalImage && <ImageModal imageUrl={modalImage} onClose={() => setModalImage(null)} />}
@@ -265,7 +260,6 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         />
       )}
 
-      {/* ⚠️ Confirmar eliminación de respuesta */}
       {confirmDeleteSubmission && (
         <ConfirmModal
           message="¿Estás seguro de que deseas eliminar esta respuesta? Esta acción no se puede deshacer."
@@ -285,11 +279,10 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
         />
       )}
 
-      <article className="bg-[#3e4145] rounded-xl overflow-hidden border border-[#787e86] hover:border-[#84888c] transition-all duration-300 shadow-lg hover:shadow-xl flex flex-col h-full">
-        {/* Imagen y encabezado */}
+      <article className="bg-card-bg rounded-xl overflow-hidden border border-border-color hover:border-[#84888c] transition-all duration-300 shadow-lg hover:shadow-xl flex flex-col h-full">
         {exercise.image_url && (
           <header
-            className="relative overflow-hidden group h-48 bg-[#787e86] bg-opacity-10 cursor-pointer"
+            className="relative overflow-hidden group h-48 bg-input-bg bg-opacity-10 cursor-pointer"
             onClick={() => setModalImage(exercise.image_url ?? null)}
           >
             <img
@@ -305,11 +298,10 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
           </header>
         )}
 
-        {/* Contenido */}
         <div className="p-4 md:p-5 flex flex-col flex-1">
-          <h3 className="text-lg md:text-xl font-bold text-[#b7babe] mb-3 line-clamp-2">{exercise.title}</h3>
+          <h3 className="text-lg md:text-xl font-bold text-primary mb-3 line-clamp-2">{exercise.title}</h3>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-[#84888c] mb-3">
+          <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm text-secondary mb-3">
             <div className="flex items-center gap-1.5">
               <Calendar size={14} />
               <span>{formatDate(exercise.created_at)}</span>
@@ -322,15 +314,15 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             )}
           </div>
 
-          <p className="text-[#b7babe] text-sm md:text-base whitespace-pre-wrap mb-4 line-clamp-3 flex-1">
+          <p className="text-primary text-sm md:text-base whitespace-pre-wrap mb-4 line-clamp-3 flex-1">
             {exercise.description}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#787e86]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-border-color">
             <button
               onClick={() => setShowSubmissions(!showSubmissions)}
               className="flex items-center justify-center sm:justify-start gap-2 
-                bg-[#2b3238]/50 hover:bg-[#2b3238]/80 text-[#e2e2e2] 
+                bg-input-bg hover-bg text-primary 
                 transition-colors py-2 px-4 rounded-lg 
                 font-medium text-sm md:text-base shadow-sm hover:shadow-md"
             >
@@ -339,18 +331,16 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                 {submissions.length} {submissions.length === 1 ? 'Respuesta' : 'Respuestas'}
               </span>
               {showSubmissions ? (
-                <ChevronUp size={18} fill="#fff" />
+                <ChevronUp size={18} fill="currentColor" />
               ) : (
-                <ChevronDown size={18} fill="#fff" />
+                <ChevronDown size={18} fill="currentColor" />
               )}
             </button>
 
             {profile?.role === 'student' && onSubmit && (
               <button
                 onClick={onSubmit}
-                className="px-4 py-2 bg-[#787e86] hover:bg-[#84888c] 
-                  text-white rounded-lg transition-colors 
-                  font-medium text-sm md:text-base shadow-md hover:shadow-lg"
+                className="btn-primary shadow-md hover:shadow-lg"
               >
                 Responder
               </button>
@@ -361,9 +351,9 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
             <button
               onClick={() => setConfirmDelete(true)}
               className="flex items-center justify-center gap-2 px-4 py-2 mt-5 
-                bg-[#161b1f] hover:bg-[#1f262b] text-white 
+                bg-input-bg hover-bg text-primary 
                 rounded-lg transition-colors font-medium 
-                text-sm md:text-base shadow-md hover:shadow-lg border border-[#2b3238]"
+                text-sm md:text-base shadow-md hover:shadow-lg border border-border-color"
             >
               <X size={18} />
               Eliminar ejercicio
@@ -372,23 +362,22 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
 
           {/* Mostrar respuestas */}
           {showSubmissions && submissions.length > 0 && (
-            <div className="mt-4 space-y-3 pt-4 border-t border-[#787e86]">
+            <div className="mt-4 space-y-3 pt-4 border-t border-border-color">
               {submissions.map((submission) => (
-                <div key={submission.id} className="bg-[#787e86]/20 rounded-lg p-3 md:p-4 border border-[#787e86]">
-
+                <div key={submission.id} className="bg-input-bg bg-opacity-20 rounded-lg p-3 md:p-4 border border-border-color">
                   
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-[#b7babe] font-medium text-sm md:text-base truncate">
+                      <p className="text-primary font-medium text-sm md:text-base truncate">
                         {submission.student?.full_name}
                       </p>
-                      <p className="text-xs text-[#84888c] mt-0.5">{formatDate(submission.created_at)}</p>
+                      <p className="text-xs text-secondary mt-0.5">{formatDate(submission.created_at)}</p>
                     </div>
                     
                     {profile?.role === 'professor' && (
                       <button
                         onClick={() => setConfirmDeleteSubmission(submission.id)}
-                        className="p-2 hover:bg-[#3e4145] rounded-lg transition-colors ml-2"
+                        className="p-2 hover-bg rounded-lg transition-colors ml-2"
                         title="Eliminar respuesta"
                       >
                         <Trash2 size={18} className="text-red-400 hover:text-red-300" />
@@ -396,18 +385,42 @@ export default function ExerciseCard({ exercise, onSubmit }: ExerciseCardProps) 
                     )}
                   </div>
 
-                  {submission.image_url && (
-                    <img
-                      src={submission.image_url}
-                      alt="Respuesta"
-                      className="w-full rounded-lg mb-3 max-h-48 object-cover cursor-pointer"
-                      onClick={() => setModalImage(submission.image_url)}
-                    />
+                  {/* 📝 TEXTO DE RESPUESTA - MEJORADO */}
+                  {submission.text_response && (
+                    <div className="bg-card-bg rounded-lg p-3 mb-3 border border-border-color">
+                      <p className="text-xs text-secondary mb-2 font-semibold uppercase tracking-wide">
+                        Respuesta del estudiante
+                      </p>
+                      <p className="text-primary text-sm md:text-base whitespace-pre-wrap leading-relaxed">
+                        {submission.text_response}
+                      </p>
+                    </div>
                   )}
+
+                  {/* 🖼 IMAGEN DE RESPUESTA */}
+                  {submission.image_url && (
+                    <div className="mb-3">
+                      <p className="text-xs text-secondary mb-2 font-semibold uppercase tracking-wide">
+                        Imagen adjunta
+                      </p>
+                      <img
+                        src={submission.image_url}
+                        alt="Respuesta"
+                        className="w-full rounded-lg max-h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setModalImage(submission.image_url)}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* 💬 RETROALIMENTACIÓN DEL PROFESOR */}
                   {submission.feedback && (
-                    <div className="bg-[#3e4145] rounded-lg p-3 border border-[#787e86]">
-                      <p className="text-xs text-[#84888c] mb-1 font-semibold">Retroalimentación</p>
-                      <p className="text-[#b7babe] text-sm">{submission.feedback}</p>
+                    <div className="bg-card-bg rounded-lg p-3 border border-border-color">
+                      <p className="text-xs text-secondary mb-2 font-semibold uppercase tracking-wide">
+                        Retroalimentación del profesor
+                      </p>
+                      <p className="text-primary text-sm md:text-base whitespace-pre-wrap leading-relaxed">
+                        {submission.feedback}
+                      </p>
                     </div>
                   )}
                 </div>

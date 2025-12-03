@@ -5,21 +5,22 @@ import ExerciseCard from "./ExerciseCard";
 import { useExercises } from "../hooks/useExercises";
 
 type FilterType = 'all' | 'student' | 'exercise';
+
 const SubmissionPost = ({ submission, onClick }: { submission: Submission; onClick: () => void }) => (
     <article
         key={submission.id}
-        className="bg-[#3e4145] rounded-xl p-4 md:p-5 border border-[#787e86]/50 hover:border-[#84888c] transition-all duration-200 shadow-xl cursor-pointer mb-4 last:mb-0"
+        className="bg-card-bg rounded-xl p-4 md:p-5 border border-border-color hover:border-[#84888c] transition-all duration-200 shadow-xl cursor-pointer mb-4 last:mb-0"
         onClick={onClick}
     >
         <header className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-[#787e86] flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-input-bg flex items-center justify-center text-primary font-bold text-lg">
                 {submission.student?.full_name[0]}
             </div>
             <div>
-                <p className="text-sm font-semibold text-[#b7babe] hover:underline">
+                <p className="text-sm font-semibold text-primary hover:underline">
                     {submission.student?.full_name}
                 </p>
-                <p className="text-xs text-[#84888c] flex items-center gap-1">
+                <p className="text-xs text-secondary flex items-center gap-1">
                     <Clock size={12} />
                     {new Date(submission.created_at).toLocaleDateString()}
                 </p>
@@ -27,31 +28,31 @@ const SubmissionPost = ({ submission, onClick }: { submission: Submission; onCli
         </header>
 
         {/* Contenido principal: Título del Ejercicio y Status */}
-        <h3 className="text-lg font-bold text-[#b7babe] mb-2">
+        <h3 className="text-lg font-bold text-primary mb-2">
             Respuesta a: {submission.exercise?.title}
         </h3>
 
         <img
             src={submission.image_url}
             alt="Respuesta del estudiante"
-            className="w-full max-h-96 object-cover rounded-lg mb-3 border border-[#787e86]/30"
+            className="w-full max-h-96 object-cover rounded-lg mb-3 border border-border-color"
         />
 
         {/* Feedback/Acción */}
-        <footer className={`flex items-center justify-between mt-3 p-2 rounded-lg ${submission.feedback ? 'bg-[#787e86] bg-opacity-20' : 'bg-[#787e86] bg-opacity-10'}`}>
+        <footer className={`flex items-center justify-between mt-3 p-2 rounded-lg ${submission.feedback ? 'bg-input-bg bg-opacity-20' : 'bg-input-bg bg-opacity-10'}`}>
             <div className="flex items-center gap-2 text-sm font-medium">
                 {submission.feedback ? (
                     <span className="text-green-400 flex items-center gap-1">
                         <CheckCircle size={16} /> Retroalimentación Dada
                     </span>
                 ) : (
-                    <span className="text-[#b7babe] flex items-center gap-1">
+                    <span className="text-primary flex items-center gap-1">
                         <MessageSquare size={16} /> Pendiente de Revisión
                     </span>
                 )}
             </div>
             <button
-                className="px-3 py-1 bg-[#787e86] hover:bg-[#84888c] text-white rounded-full transition-colors text-xs font-semibold"
+                className="px-3 py-1 bg-input-bg hover-bg text-primary rounded-full transition-colors text-xs font-semibold"
                 onClick={(e) => {
                     e.stopPropagation();
                     onClick();
@@ -104,12 +105,12 @@ export default function AnswersAndExercises({
         if (profile?.role === 'professor' && filterType === 'student') {
             return (
                 <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-[#b7babe] mb-6 border-b border-[#787e86]/50 pb-3 flex items-center gap-2">
-                        <Filter size={20} className="text-[#787e86]" />
+                    <h2 className="text-xl font-bold text-primary mb-6 border-b border-border-color pb-3 flex items-center gap-2">
+                        <Filter size={20} className="text-muted" />
                         Feed de Respuestas
                     </h2>
                     {filteredSubmissions.length === 0 ? (
-                        <div className="text-center py-12 text-[#84888c] bg-[#3e4145] rounded-xl p-6">
+                        <div className="text-center py-12 text-secondary bg-card-bg rounded-xl p-6">
                             No hay respuestas para mostrar en el feed.
                         </div>
                     ) : (
@@ -129,11 +130,11 @@ export default function AnswersAndExercises({
         }
         return (
             <div className="space-y-4">
-                <h2 className="text-xl font-bold text-[#b7babe] mb-6 border-b border-[#787e86]/50 pb-3">
+                <h2 className="text-xl font-bold text-primary mb-6 border-b border-border-color pb-3">
                     {profile?.role === 'professor' ? 'Mis Ejercicios y Publicaciones' : 'Explorar Ejercicios'}
                 </h2>
                 {filteredExercises?.length === 0 ? (
-                    <div className="text-center py-12 text-[#84888c] bg-[#3e4145] rounded-xl p-6">
+                    <div className="text-center py-12 text-secondary bg-card-bg rounded-xl p-6">
                         {searchQuery
                             ? 'No se encontraron ejercicios con tu búsqueda.'
                             : 'No hay ejercicios disponibles para mostrar en el feed.'}
@@ -162,12 +163,12 @@ export default function AnswersAndExercises({
     return (
         <div className="lg:col-span-2 xl:col-span-3">
             {/* Encabezado Principal y Filtros */}
-            <div className="bg-[#3e4145] sticky top-0 z-10 pt-1 pb-4 mb-4">
-                <h3 className="text-2xl md:text-3xl font-normal text-[#b7babe] mb-1">
+            <div className="bg-card-bg sticky top-0 z-10 pt-1 pb-4 mb-4">
+                <h3 className="text-2xl md:text-3xl font-normal text-primary mb-1">
                     Inicio
                 </h3>
 
-                <p className="text-[#84888c] text-sm mb-4">
+                <p className="text-secondary text-sm mb-4">
                     {profile?.role === 'professor'
                         ? 'Tu línea de tiempo de ejercicios y respuestas.'
                         : 'Descubre y participa en nuevos ejercicios.'}
@@ -175,12 +176,12 @@ export default function AnswersAndExercises({
 
                 {/* Botones de Navegación/Filtro (tipo tabs de Twitter) */}
                 {profile?.role === 'professor' && (
-                    <div className="flex border-b border-[#787e86]/50">
+                    <div className="flex border-b border-border-color">
                         <button
                             onClick={() => setFilterType('all')}
                             className={`flex-1 text-center py-3 transition-colors font-semibold text-sm md:text-base border-b-4 ${filterType === 'all'
-                                ? 'text-[#b7babe] border-[#787e86]'
-                                : 'text-[#84888c] border-transparent hover:bg-[#787e86]/10'
+                                ? 'text-primary border-input-bg'
+                                : 'text-secondary border-transparent hover-bg'
                                 }`}
                         >
                             Ejercicios
@@ -188,8 +189,8 @@ export default function AnswersAndExercises({
                         <button
                             onClick={() => setFilterType('student')}
                             className={`flex-1 text-center py-3 transition-colors font-semibold text-sm md:text-base border-b-4 ${filterType === 'student'
-                                ? 'text-[#b7babe] border-[#787e86]'
-                                : 'text-[#84888c] border-transparent hover:bg-[#787e86]/10'
+                                ? 'text-primary border-input-bg'
+                                : 'text-secondary border-transparent hover-bg'
                                 }`}
                         >
                             Respuestas
