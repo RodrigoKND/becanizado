@@ -1,4 +1,7 @@
-import { Search, Youtube } from 'lucide-react';
+import { Plus, Search, Youtube } from 'lucide-react';
+import { useState } from 'react';
+import CreateExercise from './CreateExercise';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface HeaderProps {
   searchQuery: string;
@@ -6,6 +9,9 @@ interface HeaderProps {
 }
 
 export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
+  const [showCreateExercise, setShowCreateExercise] = useState(false);
+  const { theme } = useTheme();
+
   return (
     <header
       className="min-h-24 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-0 border-b bg-card-bg border-border-color"
@@ -31,7 +37,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
       </div>
 
       {/* Botón de YouTube */}
-      <div className="flex justify-center my-4">
+      <div className="flex justify-center my-4 gap-4">
         <a
           href="https://www.youtube.com/@BECANIZADO"
           target="_blank"
@@ -42,11 +48,31 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
           <span className="absolute inset-[-1000%] [animation:border_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ff4c4c_0%,#cc0000_50%,#ff7f7f_100%)]"></span>
 
           {/* Contenido */}
-          <span className="inline-flex items-center justify-center w-full px-4 py-2 text-sm text-red-200 rounded-full cursor-pointer bg-card-bg backdrop-blur-3xl whitespace-nowrap flex gap-2 font-medium">
+          <span className="items-center justify-center w-full px-4 py-2 text-sm text-red-400 rounded-full cursor-pointer bg-card-bg backdrop-blur-3xl whitespace-nowrap flex gap-2 font-medium">
             <Youtube size={20} />
             Youtube
           </span>
         </a>
+        <button
+          type="button"
+          aria-label='Crate an exercise'
+          title='Crear un nuevo ejercicio'
+          className='rounded-full p-4 border hidden lg:block'
+          style={{
+            backgroundColor: theme === 'light' ? '#f3f4f6' : '#3e4145',
+            borderColor: theme === 'light' ? '#d1d5db' : '#fff',
+            color: theme === 'light' ? '#1f2937' : '#b7babe'
+          }}
+          onClick={() => setShowCreateExercise(true)}
+        >
+          <Plus size={20} />
+        </button>
+
+        {
+          showCreateExercise && (
+            <CreateExercise onClose={() => setShowCreateExercise(false)} onSuccess={() => { }} />
+          )
+        }
       </div>
     </header>
   );
