@@ -3,26 +3,31 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFetch } from '../hooks/useFetch';
 import { useTheme } from '../contexts/ThemeContext';
 
-interface Videos {
-    id: string;
-    url: string;
+interface VideoItem {
     title: string;
-    attachments: { url: string }[];
+    link: string;
+    thumbnail: string;
+    pubDate: string;
 }
 
 export default function AboutMeChannelYt() {
     const { profile } = useAuth();
     const { theme } = useTheme();
 
-    const { data: videos, loading, error } = useFetch("https://rss.app/feeds/v1.1/Q1cLKorlbqMyux3c.json");
+    const { data: videos, loading, error } = useFetch(
+        "https://api.rss2json.com/v1/api.json?rss_url=https://www.youtube.com/feeds/videos.xml?channel_id=UCC845Rgvir2wWzJLKKy-c5g"
+    );
+
     return (
         <TemplateDashboard profile={profile}>
             <section className="w-full lg:col-span-4 xl:col-span-4">
-                <div className="w-fu<ll">
-                    <h2 className="text-3xl text-center font-bold mb-6"
-                    style={{
-                        color: theme === 'light' ? '#1f2937' : '#b7babe'
-                    }}>
+                <div className="w-full">
+                    <h2
+                        className="text-3xl text-center font-bold mb-6"
+                        style={{
+                            color: theme === 'light' ? '#1f2937' : '#b7babe'
+                        }}
+                    >
                         @Becanizado
                     </h2>
 
@@ -31,17 +36,17 @@ export default function AboutMeChannelYt() {
 
                     {!loading && !error && (
                         <div className="flex flex-wrap justify-center overflow-hidden gap-4">
-                            {videos?.items?.map(({ id, url, title, attachments }: Videos) => (
+                            {videos?.items?.map(({ title, link, thumbnail }: VideoItem, index: number) => (
                                 <a
-                                    key={id}
-                                    href={url}
+                                    key={index}
+                                    href={link}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="relative lg:max-w-[250px] max-w-md rounded-lg overflow-hidden shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
                                 >
                                     {/* Imagen del video */}
                                     <img
-                                        src={attachments?.[0]?.url}
+                                        src={thumbnail}
                                         alt={title}
                                         className="w-full h-60 object-cover"
                                     />
@@ -64,6 +69,5 @@ export default function AboutMeChannelYt() {
                 </div>
             </section>
         </TemplateDashboard>
-
     );
 }
